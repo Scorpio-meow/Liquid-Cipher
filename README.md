@@ -1,6 +1,11 @@
 # 液體解鎖 (Liquid Cipher)
 
-液體解鎖 (Liquid Cipher) 是一款基於 HTML5 Canvas 與 Web Audio API 實現的色彩混合解密網頁遊戲。玩家扮演實驗室研究員，利用減法三原色（RYB）混色邏輯，將各個試管中的化學液體進行分類與重組，使色彩比例重回平衡。
+![Language](https://img.shields.io/badge/Language-HTML5%20%2F%20CSS3%20%2F%20JavaScript-blue)
+![Graphics](https://img.shields.io/badge/Graphics-HTML5%20Canvas-red)
+![Audio](https://img.shields.io/badge/Audio-Web%20Audio%20API-orange)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+液體解鎖 (Liquid Cipher) 是一款基於 HTML5 Canvas 與 Web Audio API 實現的色彩混合解密網頁遊戲。玩家扮演實驗室研究員，利用減法三原色（RYB）混色邏輯，將各個試管中的化學液體進行分類與重組，使色彩比例重回平衡。本專案完全採用原生網頁技術開發，無外部庫依賴，展現了高效能的 2D 渲染與即時音訊合成技術。
 
 ---
 
@@ -8,20 +13,20 @@
 
 本專案為無外部依賴的單頁應用程式（SPA），您可以選擇以下任一方式運行：
 
-### 方法一：直接運行
+### 方法一：直接點擊運行
 
-直接使用瀏覽器開啟專案目錄下的 [index.html](file:///d:/Code/Liquid-Cipher/index.html) 檔案即可開始遊戲。
+直接使用瀏覽器開啟專案目錄下的 [index.html](./index.html) 檔案即可開始遊戲。
 
 ### 方法二：使用 Bun 本地伺服器（推薦）
 
-若您已安裝 Bun，可以在專案根目錄下啟動本地靜態伺服器以獲得更佳的加載與運行體驗：
+若您已安裝 Bun，可以在專案根目錄下啟動本地靜態伺服器以獲得更佳的資源加載與安全上下文運行體驗：
 
 ```bash
 # 使用 Bun 啟動靜態伺服器
 bunx serve .
 ```
 
-伺服器啟動後，依據終端機輸出的網址（通常為 `http://localhost:3000` 或 `http://localhost:5000`）在瀏覽器中開啟即可。
+伺服器啟動後，依據終端機輸出的網址（通常為 `http://localhost:3000`）在瀏覽器中開啟即可。
 
 ---
 
@@ -66,7 +71,7 @@ function blendRYB(ryb1, vol1, ryb2, vol2) {
 
 ### 3. 音效合成原理
 
-音效由 `SoundSynth` 類別控制，透過 Web Audio API 的振盪器（OscillatorNode）與增益節點（GainNode）即時生成：
+音效由 `SoundSynth` 類別控制，透過 Web Audio API 的振盪器（OscillatorNode）與增益節點（GainNode）即時生成，免去了額外下載音訊檔案的延遲與頻寬消耗：
 
 | 音效類型 | 振盪器波形 (Type) | 頻率變化 (Frequency) | 增益控制 (Gain) |
 | :--- | :--- | :--- | :--- |
@@ -80,7 +85,7 @@ function blendRYB(ryb1, vol1, ryb2, vol2) {
 每次傾倒動畫結束後，系統會檢查是否滿足通關條件：
 
 1. **單一色彩性**：所有試管內部的液體疊層必須合併為單一層（即不能有異色分層）。
-2. **色彩唯一性**：任何兩個裝有液體的試管，其內含的 RYB 色彩之歐氏距離（Euclidean Distance）必須大於 `0.12`，意即相同色彩的液體必須完全集中到同一個試管中，不能有兩個試管裝有完全相同或高度相近的顏色。
+2. **色彩唯一性**：任何兩個裝有液體的試管，其內含的 RYB 色彩之歐氏距離（Euclidean Distance）必須大於 `0.12`。意即相同色彩的液體必須完全集中到同一個試管中，不能有兩個試管裝有完全相同或高度相近的顏色。
 
 ---
 
@@ -104,23 +109,19 @@ interface Level {
 
 ### 內建關卡配置
 
-- **關卡 1：初等定性實驗**：3支試管（最大容量 4.0），包含 2 支已裝有紅、黃分層液體的試管，以及 1 支空試管作為緩衝。
-- **關卡 2：三色頻譜平衡**：5支試管（最大容量 4.0），包含 3 支裝有紅、黃、藍液體之試管與 2 支空試管，引入了更多形狀如漏斗與沙漏。
-- **關卡 3：大煉金術士的密鑰**：6支試管（最大容量 4.0），包含 3 支高度分層的試管與 3 支空試管，挑戰玩家對混色與空間的調度能力。
+- **關卡 1：初等定性實驗**：3 支試管（最大容量 4.0），包含 2 支已裝有紅、黃分層液體的試管，以及 1 支空試管作為緩衝。
+- **關卡 2：三色頻譜平衡**：5 支試管（最大容量 4.0），包含 3 支裝有紅、黃、藍液體之試管與 2 支空試管，引入了更多形狀如漏斗與沙漏。
+- **關卡 3：大煉金術士的密鑰**：6 支試管（最大容量 4.0），包含 3 支高度分層的試管與 3 支空試管，挑戰玩家對混色與空間的調度能力。
 
 ---
 
 ## 專案結構
 
-```
-Liquid-Cipher/
-│
-├── index.html        # 單頁應用程式主網頁（包含 HTML、CSS 樣式與遊戲邏輯 JavaScript）
-└── README.md         # 本說明文件
-```
+* [index.html](./index.html)：單頁應用程式主網頁（包含 HTML5 結構、CSS3 樣式與遊戲邏輯 JavaScript）。
+* [README.md](./README.md)：本專案說明文件。
 
 ---
 
 ## 授權條款
 
-本專案採用 [MIT License](https://opensource.org/licenses/MIT) 授權釋出。
+本專案採用 [MIT License](./LICENSE) 授權釋出。
