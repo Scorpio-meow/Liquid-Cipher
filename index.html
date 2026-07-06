@@ -1,39 +1,48 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>液體解鎖 (Liquid Cipher) - 實驗室解密</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
         }
+
         .tech-font {
             font-family: 'Share Tech Mono', monospace;
         }
-        /* 霓虹邊框與陰影效果 */
+
         .neon-border {
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.2), inset 0 0 15px rgba(56, 189, 248, 0.1);
             border: 1px solid rgba(56, 189, 248, 0.3);
         }
+
         .neon-glow-green {
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
         }
+
         .neon-text {
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col justify-between overflow-x-hidden">
 
-    <!-- 頂部導覽列 -->
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md py-4 px-6 flex justify-between items-center z-10">
+<body class="min-h-screen text-slate-100 flex flex-col justify-between overflow-x-hidden">
+    <header
+        class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md py-4 px-6 flex justify-between items-center z-10">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
             </div>
             <div>
                 <h1 class="text-xl font-bold tech-font tracking-wider text-sky-400 neon-text">LIQUID CIPHER</h1>
@@ -44,29 +53,36 @@
             <span class="text-sm bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg tech-font">
                 關卡: <span id="current-level-val" class="text-sky-400 font-bold">1/3</span>
             </span>
-            <button id="btn-undo" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1 border border-slate-700 active:scale-95">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+            <button id="btn-undo"
+                class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1 border border-slate-700 active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
                 復原 (Undo)
             </button>
-            <button id="btn-restart" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1 border border-slate-700 active:scale-95">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H19" /></svg>
+            <button id="btn-restart"
+                class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1 border border-slate-700 active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H19" />
+                </svg>
                 重置
             </button>
         </div>
     </header>
-
-    <!-- 遊戲主內容區 -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
-        <!-- 左側面板：混色邏輯對照表 -->
         <div class="lg:col-span-1 flex flex-col gap-4">
-            <div class="bg-slate-900/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800 flex flex-col gap-4 h-full">
-                <h2 class="text-sm font-bold text-slate-400 tracking-wider uppercase border-b border-slate-800 pb-2">🧪 混色解密指南</h2>
+            <div
+                class="bg-slate-900/60 backdrop-blur-md rounded-2xl p-5 border border-slate-800 flex flex-col gap-4 h-full">
+                <h2 class="text-sm font-bold text-slate-400 tracking-wider uppercase border-b border-slate-800 pb-2">🧪
+                    混色解密指南</h2>
                 <p class="text-xs text-slate-400 leading-relaxed">
                     本關卡模擬真實<strong>減法（RYB）色素混合</strong>，當不同液體接觸時，會融合成全新色彩。
                 </p>
-                <!-- 混色卡片群組 -->
                 <div class="flex flex-col gap-2 text-sm mt-2">
-                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
+                    <div
+                        class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
                         <div class="flex items-center gap-1.5">
                             <span class="w-3.5 h-3.5 rounded-full bg-red-500 shadow-md shadow-red-500/40"></span>
                             <span>紅</span>
@@ -80,8 +96,8 @@
                             <span class="font-bold text-orange-400">橘色</span>
                         </div>
                     </div>
-
-                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
+                    <div
+                        class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
                         <div class="flex items-center gap-1.5">
                             <span class="w-3.5 h-3.5 rounded-full bg-red-500 shadow-md shadow-red-500/40"></span>
                             <span>紅</span>
@@ -95,8 +111,8 @@
                             <span class="font-bold text-purple-400">紫色</span>
                         </div>
                     </div>
-
-                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
+                    <div
+                        class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/50 border border-slate-800">
                         <div class="flex items-center gap-1.5">
                             <span class="w-3.5 h-3.5 rounded-full bg-blue-500 shadow-md shadow-blue-500/40"></span>
                             <span>藍</span>
@@ -106,54 +122,62 @@
                         </div>
                         <span class="text-slate-500">→</span>
                         <div class="flex items-center gap-1.5">
-                            <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/40"></span>
+                            <span
+                                class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/40"></span>
                             <span class="font-bold text-emerald-400">綠色</span>
                         </div>
                     </div>
                 </div>
-
-                <!-- 互動式調色盤（供測試） -->
                 <div class="mt-4 p-4 rounded-xl bg-slate-950/80 border border-slate-800">
                     <p class="text-xs font-semibold text-sky-400 mb-2.5">🧬 實驗調色台 (即時預覽)</p>
                     <div class="grid grid-cols-3 gap-1.5 text-center mb-3">
-                        <button id="mix-test-r" class="py-1 px-2 rounded bg-red-500/20 text-red-400 text-xs border border-red-500/30 hover:bg-red-500/40 transition">紅 +1</button>
-                        <button id="mix-test-y" class="py-1 px-2 rounded bg-amber-500/20 text-amber-400 text-xs border border-amber-500/30 hover:bg-amber-500/40 transition">黃 +1</button>
-                        <button id="mix-test-b" class="py-1 px-2 rounded bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30 hover:bg-blue-500/40 transition">藍 +1</button>
+                        <button id="mix-test-r"
+                            class="py-1 px-2 rounded bg-red-500/20 text-red-400 text-xs border border-red-500/30 hover:bg-red-500/40 transition">紅
+                            +1</button>
+                        <button id="mix-test-y"
+                            class="py-1 px-2 rounded bg-amber-500/20 text-amber-400 text-xs border border-amber-500/30 hover:bg-amber-500/40 transition">黃
+                            +1</button>
+                        <button id="mix-test-b"
+                            class="py-1 px-2 rounded bg-blue-500/20 text-blue-400 text-xs border border-blue-500/30 hover:bg-blue-500/40 transition">藍
+                            +1</button>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-xs text-slate-400">混合比例:</span>
                         <span id="mix-ratio-text" class="text-xs text-sky-300 font-mono">0:0:0</span>
                     </div>
-                    <div id="mix-preview-color" class="w-full h-8 rounded-lg mt-2 border border-slate-700 bg-slate-800 flex items-center justify-center text-xs text-white shadow-inner transition-colors duration-300">
+                    <div id="mix-preview-color"
+                        class="w-full h-8 rounded-lg mt-2 border border-slate-700 bg-slate-800 flex items-center justify-center text-xs text-white shadow-inner transition-colors duration-300">
                         尚未加入色素
                     </div>
-                    <button id="btn-mix-reset" class="w-full mt-2 py-1 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded text-xs transition border border-slate-700">清空實驗</button>
+                    <button id="btn-mix-reset"
+                        class="w-full mt-2 py-1 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded text-xs transition border border-slate-700">清空實驗</button>
                 </div>
             </div>
         </div>
-
-        <!-- 中央：Canvas 遊戲畫布與操作狀態 -->
         <div class="lg:col-span-3 flex flex-col gap-4">
-            <div class="bg-slate-900/60 backdrop-blur-md rounded-2xl p-6 border border-slate-800 flex flex-col items-center justify-center relative overflow-hidden min-h-[500px]">
-                <!-- 音效按鈕 -->
-                <button id="btn-toggle-sound" aria-label="切換音效" title="切換音效" class="absolute top-4 right-4 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 p-2.5 rounded-xl border border-slate-700/80 transition active:scale-95 z-20">
-                    <svg id="sound-icon-on" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                    <svg id="sound-icon-off" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+            <div
+                class="bg-slate-900/60 backdrop-blur-md rounded-2xl p-6 border border-slate-800 flex flex-col items-center justify-center relative overflow-hidden min-h-[500px]">
+                <button id="btn-toggle-sound" aria-label="切換音效" title="切換音效"
+                    class="absolute top-4 right-4 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 p-2.5 rounded-xl border border-slate-700/80 transition active:scale-95 z-20">
+                    <svg id="sound-icon-on" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                    <svg id="sound-icon-off" class="w-5 h-5 hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                    </svg>
                 </button>
-
-                <!-- 上方提示 -->
                 <div class="text-center mb-4">
                     <p class="text-xs tracking-widest text-sky-400 font-mono uppercase">Decryption Matrix</p>
                     <h3 id="level-title" class="text-lg font-bold text-white mt-1">關卡 1: 初試身手</h3>
                     <p class="text-xs text-slate-400 mt-1">選取一支試管，點擊另一支有空位的試管來倒入液體，相同顏色請集中至同試管。</p>
                 </div>
-
-                <!-- 遊戲 Canvas -->
                 <div class="relative w-full flex justify-center items-center">
-                    <canvas id="game-canvas" class="max-w-full rounded-xl cursor-pointer" width="800" height="420"></canvas>
+                    <canvas id="game-canvas" class="max-w-full rounded-xl cursor-pointer" width="800"
+                        height="420"></canvas>
                 </div>
-
-                <!-- 動作提示資訊 -->
                 <div class="mt-4 flex gap-4 text-xs font-mono">
                     <div class="flex items-center gap-1.5 text-slate-400">
                         <span class="inline-block w-2.5 h-2.5 rounded-full bg-sky-400"></span>
@@ -167,198 +191,151 @@
             </div>
         </div>
     </main>
-
-    <!-- 底部資訊 -->
     <footer class="border-t border-slate-900 bg-slate-950 py-4 px-6 text-center text-xs text-slate-500">
         <p>© 2026 Liquid Cipher Lab. Powered by HTML5 Canvas & Web Audio API Synthesis.</p>
     </footer>
-
-    <!-- 通關彈窗 -->
-    <div id="win-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-slate-900 border border-emerald-500/40 rounded-2xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl neon-glow-green transform scale-95 transition-transform duration-300">
-            <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-                <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <div id="win-modal"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div
+            class="bg-slate-900 border border-emerald-500/40 rounded-2xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl neon-glow-green transform scale-95 transition-transform duration-300">
+            <div
+                class="w-16 h-16 bg-emerald-500/10 border border-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
             </div>
             <h3 class="text-2xl font-black tech-font text-emerald-400 mb-2 tracking-wide">CIPHER DECRYPTED</h3>
             <p class="text-sm text-slate-300 mb-6">實驗室解鎖成功！液體色彩比例已重回平衡。</p>
             <div class="flex flex-col gap-2">
-                <button id="btn-next-level" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white py-3 px-4 rounded-xl font-bold transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
+                <button id="btn-next-level"
+                    class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white py-3 px-4 rounded-xl font-bold transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/20">
                     進入下一關
                 </button>
-                <button id="btn-replay-level" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-4 rounded-xl text-xs font-semibold transition">
+                <button id="btn-replay-level"
+                    class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-4 rounded-xl text-xs font-semibold transition">
                     重新挑戰本關
                 </button>
             </div>
         </div>
     </div>
-
     <script>
-        // --- Web Audio API 擬真音效管理器 ---
         class SoundSynth {
             constructor() {
                 this.ctx = null;
                 this.enabled = true;
             }
-
             init() {
                 if (!this.ctx) {
                     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
                 }
             }
-
-            // 撥放點擊與選取音效 (乾淨的水滴聲)
             playClick() {
                 if (!this.enabled) return;
                 this.init();
                 const now = this.ctx.currentTime;
-                
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-                
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(200, now);
                 osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
-                
                 gain.gain.setValueAtTime(0.15, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-                
                 osc.start(now);
                 osc.stop(now + 0.15);
             }
-
-            // 倒水時的連續氣泡音效
             playPour() {
                 if (!this.enabled) return;
                 this.init();
                 const now = this.ctx.currentTime;
-                
-                // 建立快速重複的水滴微小音效，模擬咕嚕聲
                 for (let i = 0; i < 5; i++) {
                     const time = now + i * 0.12;
                     const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
-                    
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(250 + Math.random() * 150, time);
                     osc.frequency.exponentialRampToValueAtTime(500 + Math.random() * 100, time + 0.08);
-                    
                     gain.gain.setValueAtTime(0.08, time);
                     gain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
-                    
                     osc.connect(gain);
                     gain.connect(this.ctx.destination);
-                    
                     osc.start(time);
                     osc.stop(time + 0.08);
                 }
             }
-
-            // 錯誤操作音效
             playError() {
                 if (!this.enabled) return;
                 this.init();
                 const now = this.ctx.currentTime;
-                
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-                
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(120, now);
                 osc.frequency.linearRampToValueAtTime(80, now + 0.2);
-                
                 gain.gain.setValueAtTime(0.1, now);
                 gain.gain.linearRampToValueAtTime(0.001, now + 0.2);
-                
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-                
                 osc.start(now);
                 osc.stop(now + 0.2);
             }
-
-            // 通關交響大和弦
             playWin() {
                 if (!this.enabled) return;
                 this.init();
                 const now = this.ctx.currentTime;
-                
-                const freqs = [261.63, 329.63, 392.00, 523.25, 659.25]; // C和弦琶音
+                const freqs = [261.63, 329.63, 392.00, 523.25, 659.25];
                 freqs.forEach((f, index) => {
                     const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
-                    
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(f, now + index * 0.1);
-                    
                     gain.gain.setValueAtTime(0.0, now);
                     gain.gain.linearRampToValueAtTime(0.12, now + index * 0.1 + 0.1);
                     gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-                    
                     osc.connect(gain);
                     gain.connect(this.ctx.destination);
-                    
                     osc.start(now + index * 0.1);
                     osc.stop(now + 1.2);
                 });
             }
         }
-
         const audio = new SoundSynth();
-
-        // RYB 三線性插值系統 (紅, 黃, 藍)
         function rybToRgb(r, y, b) {
-            // 限制最大比例在 [0, 1] 之間
             r = Math.max(0, Math.min(1, r));
             y = Math.max(0, Math.min(1, y));
             b = Math.max(0, Math.min(1, b));
-
-            // RYB 顏色空間對應的 8 個頂點 RGB 值
-            const c000 = [240, 240, 245]; // 乾淨透明基質
-            const c100 = [239, 68, 68];   // 紅色 (Red)
-            const c010 = [245, 158, 11];  // 黃色 (Yellow)
-            const c001 = [37, 99, 235];   // 藍色 (Blue)
-            const c110 = [249, 115, 22];  // 橘色 (Orange = 紅 + 黃)
-            const c101 = [139, 92, 246];  // 紫色 (Purple = 紅 + 藍)
-            const c011 = [16, 185, 129];  // 綠色 (Green = 藍 + 黃)
-            const c111 = [75, 50, 30];    // 灰褐色 / 深邃暗色 (全混)
-
-            // 三線性插值計算 (Trilinear Interpolation)
+            const c000 = [240, 240, 245];
+            const c100 = [239, 68, 68];
+            const c010 = [245, 158, 11];
+            const c001 = [37, 99, 235];
+            const c110 = [249, 115, 22];
+            const c101 = [139, 92, 246];
+            const c011 = [16, 185, 129];
+            const c111 = [75, 50, 30];
             const rgb = [0, 1, 2].map(i => {
                 const i00 = c000[i] * (1 - r) + c100[i] * r;
                 const i01 = c001[i] * (1 - r) + c101[i] * r;
                 const i10 = c010[i] * (1 - r) + c110[i] * r;
-                const i11 = c011[i] * (1 - r) + c110[i] * r; // 加快二次插值收斂
-
+                const i11 = c011[i] * (1 - r) + c110[i] * r;
                 const i0 = i00 * (1 - y) + i10 * y;
                 const i1 = i01 * (1 - y) + i11 * y;
-
                 const finalVal = i0 * (1 - b) + i1 * b;
                 return Math.round(finalVal);
             });
-
-            // 修正綠色與紫色的顯示鮮豔度
             if (y > 0.1 && b > 0.1 && r < 0.3) {
-                // 提高綠色鮮豔度
                 rgb[1] = Math.min(200, rgb[1] + 25);
             }
             if (r > 0.1 && b > 0.1 && y < 0.3) {
-                // 提高紫色鮮豔度
                 rgb[0] = Math.min(160, rgb[0] + 15);
             }
-
             return rgb;
         }
-
-        // 輔助將 RYB 陣列轉換為 rgba 字串
         function rybToRgbaStr(ryb, alpha = 0.85) {
             const rgb = rybToRgb(ryb[0], ryb[1], ryb[2]);
             return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
         }
-
-        // 關卡配置
         const LEVELS = [
             {
                 title: "關卡 1: 初等定性實驗 (3支試管)",
@@ -393,141 +370,112 @@
                 maxCapacity: 4.0
             }
         ];
-
-        // 系統全局狀態
         let currentLevelIdx = 0;
         let tubes = [];
         let maxCapacity = 4.0;
         let selectedTubeId = null;
         let hoverTubeId = null;
-        let historyStack = []; // 存檔用於復原
-
-        // 倒水動畫狀態
+        let historyStack = [];
         let animState = {
             isActive: false,
             sourceId: null,
             targetId: null,
             startTime: null,
-            duration: 650, // ms
+            duration: 650,
             pouredVolume: 0,
             initialSourceLayers: [],
             initialTargetLayers: [],
             sourceRYB: [0, 0, 0]
         };
-
-        // 氣泡粒子特效系統
         let bubbles = [];
         let confetti = [];
-
-        // 核心 Canvas & UI 元素
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
-
-        // 初始化關卡
         function initLevel(levelIdx) {
             currentLevelIdx = levelIdx;
             const levelData = LEVELS[currentLevelIdx];
             document.getElementById('level-title').textContent = levelData.title;
             document.getElementById('current-level-val').textContent = `${currentLevelIdx + 1}/${LEVELS.length}`;
-            
-            // 深度克隆數據
             tubes = JSON.parse(JSON.stringify(levelData.tubes));
             maxCapacity = levelData.maxCapacity;
-            
-            // 給每個試管指派 ID 與初始視覺屬性
             tubes.forEach((t, i) => {
                 t.id = i;
                 t.angle = 0;
                 t.offsetX = 0;
                 t.offsetY = 0;
             });
-
             selectedTubeId = null;
             hoverTubeId = null;
             historyStack = [];
             animState.isActive = false;
             bubbles = [];
             confetti = [];
-
             resizeAndLayout();
         }
-
-        // 計算試管排版，自動因應寬度縮放
         function resizeAndLayout() {
             const count = tubes.length;
             const spacing = Math.min(100, (canvas.width - 100) / count);
             const totalW = (count - 1) * spacing;
             const startX = (canvas.width - totalW) / 2;
-
             tubes.forEach((t, i) => {
                 t.x = startX + i * spacing;
-                t.y = canvas.height - 100; // 底部位置
+                t.y = canvas.height - 100;
                 t.width = 65;
                 t.height = 190;
             });
         }
-
-        // 五種試管外型路徑產生
         function defineTubePath(ctx, x, y, w, h, shape) {
             ctx.beginPath();
             if (shape === 'cylinder') {
-                // 直筒試管
-                ctx.moveTo(x - w/2, y - h);
-                ctx.lineTo(x - w/2, y - 15);
-                ctx.arcTo(x - w/2, y, x, y, 15);
-                ctx.arcTo(x + w/2, y, x + w/2, y - 15, 15);
-                ctx.lineTo(x + w/2, y - h);
-            } 
+                ctx.moveTo(x - w / 2, y - h);
+                ctx.lineTo(x - w / 2, y - 15);
+                ctx.arcTo(x - w / 2, y, x, y, 15);
+                ctx.arcTo(x + w / 2, y, x + w / 2, y - 15, 15);
+                ctx.lineTo(x + w / 2, y - h);
+            }
             else if (shape === 'erlenmeyer') {
-                // 三角錐瓶
                 const neckW = 16;
                 const neckH = 45;
                 ctx.moveTo(x - neckW, y - h);
                 ctx.lineTo(x - neckW, y - h + neckH);
-                ctx.lineTo(x - w/2, y - 10);
-                ctx.arcTo(x - w/2, y, x, y, 12);
-                ctx.arcTo(x + w/2, y, x + w/2, y - 10, 12);
+                ctx.lineTo(x - w / 2, y - 10);
+                ctx.arcTo(x - w / 2, y, x, y, 12);
+                ctx.arcTo(x + w / 2, y, x + w / 2, y - 10, 12);
                 ctx.lineTo(x + neckW, y - h + neckH);
                 ctx.lineTo(x + neckW, y - h);
-            } 
+            }
             else if (shape === 'bulb') {
-                // 圓底燒瓶
                 const neckW = 14;
                 const neckH = 65;
                 ctx.moveTo(x - neckW, y - h);
                 ctx.lineTo(x - neckW, y - h + neckH);
-                // 使用貝氏曲線繪製完美的下擺圓球形狀
-                ctx.bezierCurveTo(x - w/2 - 10, y - h + neckH + 10, x - w/2 - 5, y, x, y);
-                ctx.bezierCurveTo(x + w/2 + 5, y, x + w/2 + 10, y - h + neckH + 10, x + neckW, y - h + neckH);
+                ctx.bezierCurveTo(x - w / 2 - 10, y - h + neckH + 10, x - w / 2 - 5, y, x, y);
+                ctx.bezierCurveTo(x + w / 2 + 5, y, x + w / 2 + 10, y - h + neckH + 10, x + neckW, y - h + neckH);
                 ctx.lineTo(x + neckW, y - h);
-            } 
+            }
             else if (shape === 'funnel') {
-                // 寬漏斗型瓶
-                ctx.moveTo(x - w/2, y - h);
-                ctx.lineTo(x - 14, y - h/2);
+                ctx.moveTo(x - w / 2, y - h);
+                ctx.lineTo(x - 14, y - h / 2);
                 ctx.lineTo(x - 14, y - 10);
                 ctx.arcTo(x - 14, y, x, y, 10);
                 ctx.arcTo(x + 14, y, x + 14, y - 10, 10);
-                ctx.lineTo(x + 14, y - h/2);
-                ctx.lineTo(x + w/2, y - h);
-            } 
+                ctx.lineTo(x + 14, y - h / 2);
+                ctx.lineTo(x + w / 2, y - h);
+            }
             else if (shape === 'hourglass') {
-                // 沙漏型試管 (中間縮窄)
-                ctx.moveTo(x - w/2, y - h);
-                ctx.lineTo(x - 12, y - h/2);
-                ctx.lineTo(x - w/2 + 5, y - 15);
-                ctx.arcTo(x - w/2 + 5, y, x, y, 15);
-                ctx.arcTo(x + w/2 - 5, y, x + w/2 - 5, y - 15, 15);
-                ctx.lineTo(x + 12, y - h/2);
-                ctx.lineTo(x + w/2, y - h);
+                ctx.moveTo(x - w / 2, y - h);
+                ctx.lineTo(x - 12, y - h / 2);
+                ctx.lineTo(x - w / 2 + 5, y - 15);
+                ctx.arcTo(x - w / 2 + 5, y, x, y, 15);
+                ctx.arcTo(x + w / 2 - 5, y, x + w / 2 - 5, y - 15, 15);
+                ctx.lineTo(x + 12, y - h / 2);
+                ctx.lineTo(x + w / 2, y - h);
             }
         }
-
-        // 建立微小的上升氣泡粒子
         function createBubble(tubeId, r, yVal, ryb) {
             bubbles.push({
                 tubeId,
-                x: (Math.random() - 0.5) * 20, // 試管內相對位移
+                x: (Math.random() - 0.5) * 20,
                 y: yVal,
                 size: Math.random() * 2.5 + 1.2,
                 vy: -(Math.random() * 0.4 + 0.3),
@@ -535,8 +483,6 @@
                 color: rybToRgbaStr(ryb, 0.45)
             });
         }
-
-        // 通關拉炮碎紙屑特效
         function spawnConfetti() {
             for (let i = 0; i < 90; i++) {
                 confetti.push({
@@ -551,57 +497,39 @@
                 });
             }
         }
-
-        // 繪製單個試管與內部液體
         function drawTube(t, renderLayers) {
             ctx.save();
-            
-            // 執行平移與傾斜
             ctx.translate(t.x + t.offsetX, t.y + t.offsetY);
             if (t.angle !== 0) {
-                // 以試管口 (0, -height) 作為旋轉中心點
                 ctx.translate(0, -t.height);
                 ctx.rotate(t.angle);
                 ctx.translate(0, t.height);
             }
-
-            const hLiq = t.height - 25; // 可盛裝液體之最大高度高度
+            const hLiq = t.height - 25;
             const hUnit = hLiq / maxCapacity;
-
-            // 1. 裁剪路徑以灌入液體 (限制在內部)
             ctx.save();
             defineTubePath(ctx, 0, 0, t.width - 8, t.height - 4, t.shape);
             ctx.clip();
-
-            // 繪製液體層
             let currentY = 0;
             renderLayers.forEach((layer) => {
                 const layerH = layer.volume * hUnit;
                 const topY = -currentY - layerH;
                 const bottomY = -currentY;
-
-                // 建立精美的漸層色，呈現3D半透明感
-                const grad = ctx.createLinearGradient(-t.width/2, 0, t.width/2, 0);
+                const grad = ctx.createLinearGradient(-t.width / 2, 0, t.width / 2, 0);
                 const rgbCenter = rybToRgbaStr(layer.ryb, 0.88);
                 const rgbEdge = rybToRgbaStr(layer.ryb, 0.72);
                 grad.addColorStop(0, rgbEdge);
                 grad.addColorStop(0.35, rgbCenter);
                 grad.addColorStop(1, rgbEdge);
-
                 ctx.fillStyle = grad;
                 ctx.fillRect(-t.width, topY, t.width * 2, layerH);
-
-                // 畫微小的液體交界波折
                 ctx.fillStyle = rybToRgbaStr(layer.ryb, 0.15);
                 ctx.beginPath();
                 ctx.arc(0, topY, 4, 0, Math.PI * 2);
                 ctx.fill();
-
                 currentY += layerH;
             });
             ctx.restore();
-
-            // 2. 繪製氣泡
             bubbles.forEach((b, index) => {
                 if (b.tubeId === t.id) {
                     ctx.save();
@@ -612,92 +540,61 @@
                     ctx.restore();
                 }
             });
-
-            // 3. 繪製試管本體玻璃外框與高光
-            ctx.strokeStyle = (selectedTubeId === t.id) ? 'rgba(56, 189, 248, 0.9)' : 
-                              (hoverTubeId === t.id) ? 'rgba(56, 189, 248, 0.55)' : 'rgba(255, 255, 255, 0.22)';
+            ctx.strokeStyle = (selectedTubeId === t.id) ? 'rgba(56, 189, 248, 0.9)' :
+                (hoverTubeId === t.id) ? 'rgba(56, 189, 248, 0.55)' : 'rgba(255, 255, 255, 0.22)';
             ctx.lineWidth = (selectedTubeId === t.id) ? 3.5 : 2;
-            
-            // 繪製玻璃陰影
             ctx.shadowColor = (selectedTubeId === t.id) ? 'rgba(56, 189, 248, 0.5)' : 'transparent';
             ctx.shadowBlur = (selectedTubeId === t.id) ? 12 : 0;
-            
             defineTubePath(ctx, 0, 0, t.width, t.height, t.shape);
             ctx.stroke();
-
-            // 繪製試管口邊緣
             ctx.shadowBlur = 0;
             ctx.fillStyle = ctx.strokeStyle;
             ctx.beginPath();
-            ctx.ellipse(0, -t.height, t.width/2 + 2, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, -t.height, t.width / 2 + 2, 4, 0, 0, Math.PI * 2);
             ctx.fill();
-
-            // 4. 加上玻璃反光弧線
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.moveTo(-t.width/2 + 5, -t.height + 15);
-            ctx.lineTo(-t.width/2 + 5, -15);
+            ctx.moveTo(-t.width / 2 + 5, -t.height + 15);
+            ctx.lineTo(-t.width / 2 + 5, -15);
             ctx.stroke();
-
             ctx.restore();
         }
-
-        // 繪製傾斜倒水時的水流線條
         function drawPouringStream() {
             if (!animState.isActive) return;
-
             const elapsed = Date.now() - animState.startTime;
             const progress = Math.min(1, elapsed / animState.duration);
-            
-            // 只有在流程階段 (0.2 到 0.8) 間才渲染倒水線條
             if (progress > 0.18 && progress < 0.82) {
                 const src = tubes.find(t => t.id === animState.sourceId);
                 const tgt = tubes.find(t => t.id === animState.targetId);
-                
-                // 估計旋轉後的試管口位置 (World Coordinates)
                 const sAngle = src.angle;
                 const srcLipX = src.x + src.offsetX - Math.sin(sAngle) * (-5);
                 const srcLipY = src.y - src.height + src.offsetY - Math.cos(sAngle) * (5);
-
-                // 計算目標瓶口中心與液面高度
                 const tgtLiqH = getTubeTotalVolume(tgt) * ((tgt.height - 25) / maxCapacity);
                 const tgtSurfX = tgt.x;
                 const tgtSurfY = tgt.y - tgtLiqH;
-
-                // 繪製拋物線落水流
                 ctx.save();
                 const grad = ctx.createLinearGradient(srcLipX, srcLipY, tgtSurfX, tgtSurfY);
                 grad.addColorStop(0, rybToRgbaStr(animState.sourceRYB, 0.95));
                 grad.addColorStop(1, rybToRgbaStr(animState.sourceRYB, 0.8));
-
                 ctx.strokeStyle = grad;
-                ctx.lineWidth = 4 + Math.sin(Date.now() * 0.05) * 1.5; // 水流抖動感
+                ctx.lineWidth = 4 + Math.sin(Date.now() * 0.05) * 1.5;
                 ctx.lineCap = 'round';
-
                 ctx.beginPath();
                 ctx.moveTo(srcLipX, srcLipY);
-                // 創造微細的貝氏控制點，達到自然流動曲線
                 const cpY = Math.min(srcLipY, tgtSurfY) - 20;
-                ctx.quadraticCurveTo((srcLipX + tgtSurfX)/2, cpY, tgtSurfX, tgtSurfY);
+                ctx.quadraticCurveTo((srcLipX + tgtSurfX) / 2, cpY, tgtSurfX, tgtSurfY);
                 ctx.stroke();
-
-                // 水流打在液面上的濺起微泡與特效
                 ctx.fillStyle = rybToRgbaStr(animState.sourceRYB, 0.6);
                 ctx.beginPath();
                 ctx.arc(tgtSurfX, tgtSurfY, Math.random() * 6 + 3, 0, Math.PI * 2);
                 ctx.fill();
-                
                 ctx.restore();
             }
         }
-
-        // 計算特定試管的總體積
         function getTubeTotalVolume(t) {
             return t.layers.reduce((sum, l) => sum + l.volume, 0);
         }
-
-        // 將兩個 RYB 顏色融合
         function blendRYB(ryb1, vol1, ryb2, vol2) {
             const tot = vol1 + vol2;
             if (tot === 0) return [0, 0, 0];
@@ -707,13 +604,8 @@
                 (ryb1[2] * vol1 + ryb2[2] * vol2) / tot
             ];
         }
-
-        // 核心渲染動畫 Loop
         function draw() {
-            // 清理畫布
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // 繪製背景發光微網格
             ctx.strokeStyle = 'rgba(51, 65, 85, 0.12)';
             ctx.lineWidth = 1;
             const grid = 40;
@@ -723,8 +615,6 @@
             for (let y = 0; y < canvas.height; y += grid) {
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
             }
-
-            // 更新泡泡物理
             bubbles.forEach((b, idx) => {
                 b.y += b.vy;
                 b.alpha -= 0.006;
@@ -732,35 +622,26 @@
                     bubbles.splice(idx, 1);
                 }
             });
-
-            // 繪製試管
             tubes.forEach(t => {
                 let layersToRender = [...t.layers];
-
-                // 如果正在執行倒水動畫
                 if (animState.isActive && (t.id === animState.sourceId || t.id === animState.targetId)) {
                     const elapsed = Date.now() - animState.startTime;
                     const progress = Math.min(1, elapsed / animState.duration);
-
                     if (t.id === animState.sourceId) {
-                        // 1. 旋轉與平移參數插值
                         const sX = t.x;
                         const tX = tubes.find(x => x.id === animState.targetId).x;
-                        const direction = Math.sign(tX - sX); // 判定往左還是往右
-
+                        const direction = Math.sign(tX - sX);
                         if (progress <= 0.2) {
                             const p = progress / 0.2;
-                            t.angle = p * (Math.PI / 2.6) * direction; // 最大旋轉 70 度
+                            t.angle = p * (Math.PI / 2.6) * direction;
                             t.offsetX = (tX - sX) * 0.45 * p;
                             t.offsetY = -45 * p;
                         } else if (progress <= 0.8) {
                             t.angle = (Math.PI / 2.6) * direction;
                             t.offsetX = (tX - sX) * 0.45;
                             t.offsetY = -45;
-                            
-                            // 連續製造上升泡泡
                             if (Math.random() < 0.25) {
-                                createBubble(animState.targetId, t.width, -Math.random()*60, animState.sourceRYB);
+                                createBubble(animState.targetId, t.width, -Math.random() * 60, animState.sourceRYB);
                             }
                         } else {
                             const p = (1.0 - progress) / 0.2;
@@ -768,13 +649,9 @@
                             t.offsetX = (tX - sX) * 0.45 * p;
                             t.offsetY = -45 * p;
                         }
-
-                        // 2. 減少源頭液體高
                         if (progress > 0.2 && progress <= 0.8) {
                             const flowPercent = (progress - 0.2) / 0.6;
                             const decVol = flowPercent * animState.pouredVolume;
-                            
-                            // 動態重建模擬液面
                             layersToRender = JSON.parse(JSON.stringify(animState.initialSourceLayers));
                             let left = decVol;
                             for (let idx = layersToRender.length - 1; idx >= 0; idx--) {
@@ -789,7 +666,6 @@
                                 }
                             }
                         } else if (progress > 0.8) {
-                            // 動畫快結束時，呈現剩餘結果
                             layersToRender = JSON.parse(JSON.stringify(animState.initialSourceLayers));
                             let left = animState.pouredVolume;
                             for (let idx = layersToRender.length - 1; idx >= 0; idx--) {
@@ -803,20 +679,16 @@
                                 }
                             }
                         }
-                    } 
+                    }
                     else if (t.id === animState.targetId) {
-                        // 目標試管：增加液體與漸變融合
                         if (progress > 0.2 && progress <= 0.8) {
                             const flowPercent = (progress - 0.2) / 0.6;
                             const incVol = flowPercent * animState.pouredVolume;
-
                             layersToRender = JSON.parse(JSON.stringify(animState.initialTargetLayers));
-                            
                             if (layersToRender.length === 0) {
                                 layersToRender.push({ ryb: animState.sourceRYB, volume: incVol });
                             } else {
                                 const topL = layersToRender[layersToRender.length - 1];
-                                // 當接觸不同顏色，立即引發漸變物理混合！
                                 const nextColor = blendRYB(topL.ryb, topL.volume, animState.sourceRYB, incVol);
                                 topL.ryb = nextColor;
                                 topL.volume += incVol;
@@ -834,61 +706,41 @@
                         }
                     }
                 }
-
                 drawTube(t, layersToRender);
             });
-
-            // 繪製倒入的水流
             drawPouringStream();
-
-            // 繪製與更新通關彩屑
             confetti.forEach((c, idx) => {
                 c.x += c.vx;
                 c.y += c.vy;
                 c.angle += c.va;
-                
                 ctx.save();
                 ctx.fillStyle = c.color;
                 ctx.translate(c.x, c.y);
                 ctx.rotate(c.angle * Math.PI / 180);
-                ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+                ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size);
                 ctx.restore();
-
                 if (c.y > canvas.height + 20) {
                     confetti.splice(idx, 1);
                 }
             });
-
-            // 持續執行 Loop
             requestAnimationFrame(draw);
         }
-
-        // 觸發倒水核心邏輯
         function executePour(srcId, tgtId) {
             const src = tubes.find(t => t.id === srcId);
             const tgt = tubes.find(t => t.id === tgtId);
-
             if (src.layers.length === 0) {
                 audio.playError();
                 return;
             }
-
             const srcTop = src.layers[src.layers.length - 1];
             const tgtTotal = getTubeTotalVolume(tgt);
             const available = maxCapacity - tgtTotal;
-
             if (available <= 0.05) {
                 audio.playError();
-                return; // 目標試管已滿
+                return;
             }
-
-            // 紀錄歷史以便復原
             pushHistory();
-
-            // 決定要倒入的體積
             const pourVol = Math.min(srcTop.volume, available);
-
-            // 設定動畫物理參數
             animState.isActive = true;
             animState.sourceId = srcId;
             animState.targetId = tgtId;
@@ -897,19 +749,12 @@
             animState.initialSourceLayers = JSON.parse(JSON.stringify(src.layers));
             animState.initialTargetLayers = JSON.parse(JSON.stringify(tgt.layers));
             animState.sourceRYB = [...srcTop.ryb];
-
-            // 撥放連續倒水泡泡音效
             audio.playPour();
-
-            // 當倒水動畫完全結束後，落實物理更新
             setTimeout(() => {
-                // 1. 扣除源頭液體
                 srcTop.volume -= pourVol;
                 if (srcTop.volume <= 0.01) {
                     src.layers.pop();
                 }
-
-                // 2. 加入或混合至目標液體
                 if (tgt.layers.length === 0) {
                     tgt.layers.push({ ryb: animState.sourceRYB, volume: pourVol });
                 } else {
@@ -918,26 +763,17 @@
                     tgtTop.ryb = nextColor;
                     tgtTop.volume += pourVol;
                 }
-
-                // 合併同管中，顏色足夠接近的連續層
                 mergeAdjacentLayers(tgt);
-
-                // 重設試管的旋轉位移
                 src.angle = 0;
                 src.offsetX = 0;
                 src.offsetY = 0;
-
                 animState.isActive = false;
                 selectedTubeId = null;
-
-                // 檢查是否成功解鎖
                 if (checkWinCondition()) {
                     triggerWinState();
                 }
             }, animState.duration);
         }
-
-        // 合併相鄰且色彩極微相似的層 (防分裂冗餘)
         function mergeAdjacentLayers(tube) {
             if (tube.layers.length < 2) return;
             const merged = [];
@@ -960,13 +796,9 @@
             }
             tube.layers = merged;
         }
-
-        // 存檔歷史狀態
         function pushHistory() {
             historyStack.push(JSON.stringify(tubes));
         }
-
-        // 復原
         function popHistory() {
             if (historyStack.length === 0 || animState.isActive) {
                 audio.playError();
@@ -977,25 +809,18 @@
             selectedTubeId = null;
             audio.playClick();
         }
-
-        // 通關判定
         function checkWinCondition() {
-            // 所有非空試管是否【只有一色且高度完美一致】
-            // 由於混合了，每管頂層如果與下層色差大，必大於1層
             for (const tube of tubes) {
                 if (tube.layers.length > 1) {
-                    return false; // 有多色尚未融合
+                    return false;
                 }
             }
-
-            // 確保同色色素完全集中到「同一支」試管中 (也就是不能有兩支不空試管內是相同的顏色)
             const activeColors = [];
             for (const tube of tubes) {
                 if (tube.layers.length === 1) {
                     activeColors.push({ id: tube.id, ryb: tube.layers[0].ryb });
                 }
             }
-
             for (let i = 0; i < activeColors.length; i++) {
                 for (let j = i + 1; j < activeColors.length; j++) {
                     const diff = Math.hypot(
@@ -1004,19 +829,15 @@
                         activeColors[i].ryb[2] - activeColors[j].ryb[2]
                     );
                     if (diff < 0.12) {
-                        return false; // 相同顏色還殘留在不同試管，尚未全數集中
+                        return false;
                     }
                 }
             }
-
             return true;
         }
-
-        // 觸發勝利與煙火
         function triggerWinState() {
             audio.playWin();
             spawnConfetti();
-            
             const modal = document.getElementById('win-modal');
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -1024,8 +845,6 @@
                 modal.querySelector('.transform').classList.remove('scale-95');
             }, 50);
         }
-
-        // 關閉通關視窗
         function closeWinModal() {
             const modal = document.getElementById('win-modal');
             modal.classList.add('opacity-0');
@@ -1034,54 +853,40 @@
                 modal.classList.add('hidden');
             }, 300);
         }
-
-        // 點擊事件解析與試管點選
         function handleCanvasClick(e) {
-            if (animState.isActive) return; // 動畫中鎖定
-
+            if (animState.isActive) return;
             const rect = canvas.getBoundingClientRect();
-            // 對齊 canvas 真實渲染像素
             const x = (e.clientX - rect.left) * (canvas.width / rect.width);
             const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-            // 偵測點擊到了哪支試管
             let clickedTube = null;
             for (const t of tubes) {
-                // 定義碰撞框 (以 t.x, t.y 為底的試管範疇)
-                const left = t.x - t.width/2 - 10;
-                const right = t.x + t.width/2 + 10;
+                const left = t.x - t.width / 2 - 10;
+                const right = t.x + t.width / 2 + 10;
                 const bottom = t.y + 10;
                 const top = t.y - t.height - 10;
-
                 if (x >= left && x <= right && y >= top && y <= bottom) {
                     clickedTube = t;
                     break;
                 }
             }
-
             if (clickedTube) {
                 audio.playClick();
                 if (selectedTubeId === null) {
-                    // 如果沒選取，且選取的試管有液體，將其提起選中
                     if (clickedTube.layers.length > 0) {
                         selectedTubeId = clickedTube.id;
-                        clickedTube.offsetY = -25; // 選中時向上飄起
+                        clickedTube.offsetY = -25;
                     }
                 } else {
-                    // 如果已經選取了一支試管
                     if (selectedTubeId === clickedTube.id) {
-                        // 點擊同試管則取消選取
                         clickedTube.offsetY = 0;
                         selectedTubeId = null;
                     } else {
-                        // 倒水到目標試管
                         const src = tubes.find(t => t.id === selectedTubeId);
-                        src.offsetY = 0; // 重置高度
+                        src.offsetY = 0;
                         executePour(selectedTubeId, clickedTube.id);
                     }
                 }
             } else {
-                // 點到空處取消選取
                 if (selectedTubeId !== null) {
                     const src = tubes.find(t => t.id === selectedTubeId);
                     if (src) src.offsetY = 0;
@@ -1089,51 +894,39 @@
                 }
             }
         }
-
-        // 滑鼠懸浮探測
         function handleCanvasMouseMove(e) {
             if (animState.isActive) return;
-
             const rect = canvas.getBoundingClientRect();
             const x = (e.clientX - rect.left) * (canvas.width / rect.width);
             const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-
             let lastHover = hoverTubeId;
             hoverTubeId = null;
             for (const t of tubes) {
-                const left = t.x - t.width/2 - 10;
-                const right = t.x + t.width/2 + 10;
+                const left = t.x - t.width / 2 - 10;
+                const right = t.x + t.width / 2 + 10;
                 const bottom = t.y + 10;
                 const top = t.y - t.height - 10;
-
                 if (x >= left && x <= right && y >= top && y <= bottom) {
                     hoverTubeId = t.id;
                     break;
                 }
             }
         }
-
-        // 互動式調色預覽控制
         let testRYB = [0, 0, 0];
         function updateMixTest() {
             const sum = testRYB[0] + testRYB[1] + testRYB[2];
             const display = document.getElementById('mix-preview-color');
             const ratioText = document.getElementById('mix-ratio-text');
-
             if (sum === 0) {
                 display.style.backgroundColor = 'transparent';
                 display.textContent = "尚未加入色素";
                 ratioText.textContent = "0:0:0";
                 return;
             }
-
-            // 歸一化 RYB
-            const norm = [testRYB[0]/sum, testRYB[1]/sum, testRYB[2]/sum];
+            const norm = [testRYB[0] / sum, testRYB[1] / sum, testRYB[2] / sum];
             const rgbStr = rybToRgbaStr(norm, 1.0);
             display.style.backgroundColor = rgbStr;
             ratioText.textContent = `${testRYB[0]} : ${testRYB[1]} : ${testRYB[2]}`;
-
-            // 給予調色成功的名字預覽
             let colorName = "自訂混合色";
             if (norm[0] > 0.8 && norm[1] < 0.1 && norm[2] < 0.1) colorName = "經典亮紅 🔴";
             else if (norm[1] > 0.8 && norm[0] < 0.1 && norm[2] < 0.1) colorName = "向日葵黃 🟡";
@@ -1142,53 +935,39 @@
             else if (Math.abs(norm[0] - norm[2]) < 0.15 && norm[1] < 0.15) colorName = "迷幻紫色 🟣";
             else if (Math.abs(norm[1] - norm[2]) < 0.15 && norm[0] < 0.15) colorName = "翡翠綠色 🟢";
             else if (norm[0] > 0.2 && norm[1] > 0.2 && norm[2] > 0.2) colorName = "暗金屬褐 🟫";
-
             display.textContent = colorName;
         }
-
-        // 調色台按鈕點擊事件
         document.getElementById('mix-test-r').addEventListener('click', () => { testRYB[0]++; audio.playClick(); updateMixTest(); });
         document.getElementById('mix-test-y').addEventListener('click', () => { testRYB[1]++; audio.playClick(); updateMixTest(); });
         document.getElementById('mix-test-b').addEventListener('click', () => { testRYB[2]++; audio.playClick(); updateMixTest(); });
         document.getElementById('btn-mix-reset').addEventListener('click', () => { testRYB = [0, 0, 0]; audio.playClick(); updateMixTest(); });
-
-        // 綁定主控制按鈕
         document.getElementById('btn-undo').addEventListener('click', popHistory);
         document.getElementById('btn-restart').addEventListener('click', () => {
             initLevel(currentLevelIdx);
             audio.playClick();
         });
-
-        // 靜音功能
         document.getElementById('btn-toggle-sound').addEventListener('click', () => {
             audio.enabled = !audio.enabled;
             document.getElementById('sound-icon-on').classList.toggle('hidden', !audio.enabled);
             document.getElementById('sound-icon-off').classList.toggle('hidden', audio.enabled);
         });
-
-        // 通關視窗按鈕
         document.getElementById('btn-next-level').addEventListener('click', () => {
             closeWinModal();
             if (currentLevelIdx + 1 < LEVELS.length) {
                 initLevel(currentLevelIdx + 1);
             } else {
-                // 所有關卡皆破關
                 setTimeout(() => {
                     alert("🎉 恭喜你！解鎖了所有色彩矩陣，完成全部實驗室模組！");
                     initLevel(0);
                 }, 400);
             }
         });
-
         document.getElementById('btn-replay-level').addEventListener('click', () => {
             closeWinModal();
             initLevel(currentLevelIdx);
         });
-
-        // 事件監聽掛載 (包含滑鼠與行動版觸控)
         canvas.addEventListener('mousedown', handleCanvasClick);
         canvas.addEventListener('mousemove', handleCanvasMouseMove);
-        
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touch = e.touches[0];
@@ -1197,15 +976,12 @@
             const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
             handleCanvasClick({ clientX: touch.clientX, clientY: touch.clientY });
         }, { passive: false });
-
-        // 窗格重塑自適應
         window.addEventListener('resize', resizeAndLayout);
-
-        // 預設加載首關
-        window.onload = function() {
+        window.onload = function () {
             initLevel(0);
             draw();
         };
     </script>
 </body>
+
 </html>
