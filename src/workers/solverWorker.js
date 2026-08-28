@@ -2,13 +2,10 @@
  * 液體解鎖 (Liquid Cipher) 背景求解與關卡生成 Web Worker
  * 隔離高成本運算，確保瀏覽器主執行緒與 Canvas 渲染絕不卡頓。
  */
-
 import { generateLevel } from '../core/generator.js';
 import { solveExact, solveBoundedHint } from '../core/solver.js';
-
 self.onmessage = function (e) {
     const { type, requestId, payload } = e.data;
-
     try {
         switch (type) {
             case 'GENERATE_LEVEL': {
@@ -22,7 +19,6 @@ self.onmessage = function (e) {
                 });
                 break;
             }
-
             case 'SOLVE_EXACT': {
                 const { board, capacity, policy } = payload;
                 const solveResult = solveExact(board, capacity, policy);
@@ -34,7 +30,6 @@ self.onmessage = function (e) {
                 });
                 break;
             }
-
             case 'SOLVE_HINT': {
                 const { board, capacity, options } = payload;
                 const hintMove = solveBoundedHint(board, capacity, options);
@@ -46,7 +41,6 @@ self.onmessage = function (e) {
                 });
                 break;
             }
-
             default:
                 self.postMessage({
                     type: 'ERROR',

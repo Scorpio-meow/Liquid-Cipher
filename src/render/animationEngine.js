@@ -1,11 +1,9 @@
 /**
  * 液體解鎖 (Liquid Cipher) 60fps 動畫管線與流體物理引擎
  */
-
 import { drawTubeWithLiquids } from './liquidRenderer.js';
 import { getReagentRgbaStr } from '../core/color.js';
 import { RENDER_CONFIG } from '../core/constants.js';
-
 export class AnimationEngine {
     /**
      * @param {import('./canvas.js').CanvasManager} canvasManager
@@ -15,11 +13,9 @@ export class AnimationEngine {
         this.canvasManager = canvasManager;
         this.gameState = gameState;
         this.ctx = canvasManager.ctx;
-
         this.selectedTubeId = null;
         this.hoverTubeId = null;
         this.hintMove = null; // { from, to }
-
         this.animState = {
             isPouring: false,
             sourceId: null,
@@ -31,20 +27,15 @@ export class AnimationEngine {
             initialSourceLayers: [],
             initialTargetLayers: []
         };
-
         /** @type {Array<{ tubeId: number, x: number, y: number, size: number, vy: number, alpha: number, color: string }>} */
         this.bubbles = [];
-
         /** @type {Array<{ x: number, y: number, size: number, color: string, vx: number, vy: number, angle: number, va: number, type: string, alpha: number }>} */
         this.confetti = [];
-
         /** @type {Array<{ x: number, y: number, vx: number, vy: number, color: string, alpha: number, size: number }>} */
         this.splashParticles = [];
-
         this.isRunning = false;
         this.onPourComplete = null;
     }
-
     /**
      * 啟動 60fps 動畫循環
      */
@@ -62,14 +53,12 @@ export class AnimationEngine {
         };
         requestAnimationFrame(loop);
     }
-
     /**
      * 停止動畫循環
      */
     stop() {
         this.isRunning = false;
     }
-
     /**
      * 觸發通關彩色紙屑與全息星芒粒子
      */
@@ -77,7 +66,6 @@ export class AnimationEngine {
         this.confetti = [];
         const w = this.canvasManager.logicalWidth;
         const colors = ['#38BDF8', '#10B981', '#F59E0B', '#A855F7', '#EC4899', '#06B6D4', '#6366F1'];
-
         for (let i = 0; i < RENDER_CONFIG.confettiParticleCount + 40; i++) {
             const isStar = Math.random() < 0.25;
             this.confetti.push({
@@ -94,7 +82,6 @@ export class AnimationEngine {
             });
         }
     }
-
     /**
      * 開始執行試管傾倒動畫
      * @param {number} from
@@ -114,7 +101,6 @@ export class AnimationEngine {
         this.animState.initialTargetLayers = [...this.gameState.currentBoard[to]];
         this.onPourComplete = onComplete;
     }
-
     /**
      * 繪製流動拋物線射流與落點飛濺水花
      * @param {Object} srcLayout
@@ -123,20 +109,16 @@ export class AnimationEngine {
      */
     drawPourStream(srcLayout, tgtLayout, progress) {
         if (progress <= 0.18 || progress >= 0.82) return;
-
         const direction = Math.sign(tgtLayout.x - srcLayout.x) || 1;
         const srcLipX = srcLayout.x + direction * (srcLayout.width * 0.45);
         const srcLipY = srcLayout.y - srcLayout.height - RENDER_CONFIG.liftOffsetPx + 8;
-
         const capacity = this.gameState.currentLevelDef ? this.gameState.currentLevelDef.capacity : 4;
         const tgtUsableH = tgtLayout.height - 24;
         const tgtSegH = tgtUsableH / capacity;
         const tgtCurrentVolume = this.animState.initialTargetLayers.length + (progress - 0.2) / 0.6 * this.animState.amount;
         const tgtSurfY = tgtLayout.y - tgtCurrentVolume * tgtSegH;
         const tgtSurfX = tgtLayout.x;
-
         this.ctx.save();
-
         // 射流外層微光光暈
         const glowGrad = this.ctx.createLinearGradient(srcLipX, srcLipY, tgtSurfX, tgtSurfY);
         glowGrad.addColorStop(0, getReagentRgbaStr(this.animState.colorId, 0.4));
@@ -149,20 +131,17 @@ export class AnimationEngine {
         const controlY = Math.min(srcLipY, tgtSurfY) - 36;
         this.ctx.quadraticCurveTo((srcLipX + tgtSurfX) / 2, controlY, tgtSurfX, tgtSurfY);
         this.ctx.stroke();
-
         // 射流核心本體
         const coreGrad = this.ctx.createLinearGradient(srcLipX, srcLipY, tgtSurfX, tgtSurfY);
         coreGrad.addColorStop(0, getReagentRgbaStr(this.animState.colorId, 0.98));
         coreGrad.addColorStop(0.7, getReagentRgbaStr(this.animState.colorId, 0.9));
         coreGrad.addColorStop(1, '#ffffff');
-
         this.ctx.strokeStyle = coreGrad;
         this.ctx.lineWidth = 4.8 + Math.sin(performance.now() * 0.05) * 1.0;
         this.ctx.beginPath();
         this.ctx.moveTo(srcLipX, srcLipY);
         this.ctx.quadraticCurveTo((srcLipX + tgtSurfX) / 2, controlY, tgtSurfX, tgtSurfY);
         this.ctx.stroke();
-
         // 產生衝擊水花粒子
         if (Math.random() < 0.6) {
             this.splashParticles.push({
@@ -175,10 +154,8 @@ export class AnimationEngine {
                 size: Math.random() * 2.5 + 1.5
             });
         }
-
         this.ctx.restore();
     }
-
     /**
      * 繪製智能提示能量導引弧線 (Hint Energy Beam)
      * @param {Object} srcLayout
@@ -193,9 +170,7 @@ export class AnimationEngine {
         const ty = tgtLayout.y - tgtLayout.height - 15;
         const midX = (sx + tx) / 2;
         const peakY = Math.min(sy, ty) - 50;
-
         ctx.save();
-
         // 能量導引弧線
         ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
         ctx.lineWidth = 2.5;
@@ -205,12 +180,10 @@ export class AnimationEngine {
         ctx.moveTo(sx, sy);
         ctx.quadraticCurveTo(midX, peakY, tx, ty);
         ctx.stroke();
-
         // 沿弧線飛行的流動能量光球
         const progress = (timestamp * 0.001) % 1.0;
         const qx = (1 - progress) * (1 - progress) * sx + 2 * (1 - progress) * progress * midX + progress * progress * tx;
         const qy = (1 - progress) * (1 - progress) * sy + 2 * (1 - progress) * progress * peakY + progress * progress * ty;
-
         ctx.setLineDash([]);
         ctx.fillStyle = '#f59e0b';
         ctx.shadowColor = '#f59e0b';
@@ -218,7 +191,6 @@ export class AnimationEngine {
         ctx.beginPath();
         ctx.arc(qx, qy, 4.5, 0, Math.PI * 2);
         ctx.fill();
-
         // 目標管頂部下箭頭引導指示
         ctx.fillStyle = '#10b981';
         ctx.shadowColor = '#10b981';
@@ -230,10 +202,8 @@ export class AnimationEngine {
         ctx.lineTo(tx + 6, ty - 32 + arrowBounce);
         ctx.closePath();
         ctx.fill();
-
         ctx.restore();
     }
-
     /**
      * 單影格渲染核心
      * @param {number} timestamp
@@ -242,10 +212,8 @@ export class AnimationEngine {
         const ctx = this.ctx;
         const w = this.canvasManager.logicalWidth;
         const h = this.canvasManager.logicalHeight;
-
         // 1. 清空畫布並繪製科技環境微網格
         ctx.clearRect(0, 0, w, h);
-
         ctx.save();
         ctx.strokeStyle = 'rgba(56, 189, 248, 0.05)';
         ctx.lineWidth = 1;
@@ -256,7 +224,6 @@ export class AnimationEngine {
         for (let y = 0; y < h; y += gridSize) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
         }
-
         // 底部基座台架水平微光金屬導軌線
         const layouts = this.canvasManager.tubeLayouts;
         if (layouts.length > 0) {
@@ -272,7 +239,6 @@ export class AnimationEngine {
             ctx.moveTo(30, baseY);
             ctx.lineTo(w - 30, baseY);
             ctx.stroke();
-
             // 若為雙排，繪製第二排導軌
             const row2 = layouts.find(l => l.row === 1);
             if (row2) {
@@ -284,7 +250,6 @@ export class AnimationEngine {
             }
         }
         ctx.restore();
-
         // 2. 更新與清理氣泡
         for (let i = this.bubbles.length - 1; i >= 0; i--) {
             const b = this.bubbles[i];
@@ -294,7 +259,6 @@ export class AnimationEngine {
                 this.bubbles.splice(i, 1);
             }
         }
-
         // 更新與清理水花粒子
         for (let i = this.splashParticles.length - 1; i >= 0; i--) {
             const p = this.splashParticles[i];
@@ -314,13 +278,11 @@ export class AnimationEngine {
                 ctx.restore();
             }
         }
-
         // 3. 計算傾倒動畫階段
         let pourProgress = 0;
         if (this.animState.isPouring) {
             const elapsed = performance.now() - this.animState.startTime;
             pourProgress = Math.min(1.0, elapsed / this.animState.duration);
-
             if (pourProgress >= 1.0) {
                 this.animState.isPouring = false;
                 if (this.onPourComplete) {
@@ -330,9 +292,7 @@ export class AnimationEngine {
                 }
             }
         }
-
         const capacity = this.gameState.currentLevelDef ? this.gameState.currentLevelDef.capacity : 4;
-
         // 4. 若有提示動作，繪製導引能量弧線
         if (this.hintMove && !this.animState.isPouring) {
             const src = layouts.find(l => l.id === this.hintMove.from);
@@ -341,23 +301,19 @@ export class AnimationEngine {
                 this.drawHintGuidance(src, tgt, timestamp);
             }
         }
-
         // 5. 繪製所有試管與液體
         layouts.forEach(layout => {
             const tubeId = layout.id;
             let layersToDraw = this.gameState.currentBoard[tubeId] || [];
             let offsetY = 0;
             let angle = 0;
-
             if (this.selectedTubeId === tubeId && !this.animState.isPouring) {
                 offsetY = -RENDER_CONFIG.liftOffsetPx;
             }
-
             if (this.animState.isPouring) {
                 if (tubeId === this.animState.sourceId) {
                     const tgtLayout = layouts.find(l => l.id === this.animState.targetId);
                     const direction = tgtLayout ? Math.sign(tgtLayout.x - layout.x) || 1 : 1;
-
                     if (pourProgress <= 0.2) {
                         const p = pourProgress / 0.2;
                         offsetY = -RENDER_CONFIG.liftOffsetPx * p;
@@ -365,7 +321,6 @@ export class AnimationEngine {
                     } else if (pourProgress <= 0.8) {
                         offsetY = -RENDER_CONFIG.liftOffsetPx;
                         angle = RENDER_CONFIG.tiltAngleRad * direction;
-
                         // 隨機產生目標管內部微氣泡
                         if (Math.random() < 0.35) {
                             this.bubbles.push({
@@ -383,7 +338,6 @@ export class AnimationEngine {
                         offsetY = -RENDER_CONFIG.liftOffsetPx * p;
                         angle = p * RENDER_CONFIG.tiltAngleRad * direction;
                     }
-
                     // 動態計算來源管液體減少
                     const dec = (Math.max(0, Math.min(1, (pourProgress - 0.2) / 0.6))) * this.animState.amount;
                     const temp = [...this.animState.initialSourceLayers];
@@ -401,7 +355,6 @@ export class AnimationEngine {
                     layersToDraw = temp;
                 }
             }
-
             const state = {
                 isSelected: this.selectedTubeId === tubeId,
                 isHovered: this.hoverTubeId === tubeId,
@@ -412,11 +365,9 @@ export class AnimationEngine {
                 angle,
                 time: timestamp
             };
-
             const tubeBubbles = this.bubbles.filter(b => b.tubeId === tubeId);
             drawTubeWithLiquids(ctx, layout, layersToDraw, capacity, state, tubeBubbles);
         });
-
         // 6. 繪製傾倒射流
         if (this.animState.isPouring) {
             const srcLayout = layouts.find(l => l.id === this.animState.sourceId);
@@ -425,19 +376,16 @@ export class AnimationEngine {
                 this.drawPourStream(srcLayout, tgtLayout, pourProgress);
             }
         }
-
         // 7. 更新與繪製通關星芒與彩色紙屑粒子
         for (let i = this.confetti.length - 1; i >= 0; i--) {
             const c = this.confetti[i];
             c.x += c.vx;
             c.y += c.vy;
             c.angle += c.va;
-
             ctx.save();
             ctx.fillStyle = c.color;
             ctx.translate(c.x, c.y);
             ctx.rotate((c.angle * Math.PI) / 180);
-
             if (c.type === 'star') {
                 ctx.shadowColor = c.color;
                 ctx.shadowBlur = 8;
@@ -456,11 +404,9 @@ export class AnimationEngine {
                 ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size * 0.7);
             }
             ctx.restore();
-
             if (c.y > h + 40) {
                 this.confetti.splice(i, 1);
             }
         }
     }
 }
-

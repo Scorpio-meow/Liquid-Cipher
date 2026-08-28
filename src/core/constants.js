@@ -1,7 +1,6 @@
 /**
  * 液體解鎖 (Liquid Cipher) 全域常數與設定檔
  */
-
 // 12 種標準化實驗室化學試劑色譜定義
 export const REAGENTS = [
     {
@@ -101,7 +100,6 @@ export const REAGENTS = [
         description: '微熱珊瑚有機試劑'
     }
 ];
-
 // 5 種實驗室幾何試管造型
 export const TUBE_SHAPES = [
     'cylinder',    // 經典圓柱試管
@@ -110,7 +108,6 @@ export const TUBE_SHAPES = [
     'funnel',      // 漏斗型試管
     'hourglass'    // 沙漏型試管
 ];
-
 // Exact Solver 跨裝置確定性運算門禁政策
 export const EXACT_SOLVER_POLICY = {
     maxNodesPerAttempt: 2000000,
@@ -118,7 +115,6 @@ export const EXACT_SOLVER_POLICY = {
     maxAttempts: 120,
     uiWatchdogMs: 8000
 };
-
 // 儲存與產生器版本常數
 export const APP_CONFIG = {
     schemaVersion: 1,
@@ -127,7 +123,6 @@ export const APP_CONFIG = {
     storageKey: 'liquid_cipher_save_v1',
     cachePrefix: 'liquid_cipher_level_cache_v1_'
 };
-
 // 幾何尺寸與物理參數常數
 export const RENDER_CONFIG = {
     tubeWidth: 64,

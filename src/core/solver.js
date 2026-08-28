@@ -2,7 +2,6 @@
  * 液體解鎖 (Liquid Cipher) 狀態空間搜尋求解器
  * 包含完整最優性證明 Exact Solver (BFS) 與輕量即時提示 Bounded Solver。
  */
-
 /**
  * 檢查盤面是否處於通關目標狀態 (所有試管皆為空或裝滿單一色)
  * @param {string[][]} board - 盤面狀態
@@ -21,7 +20,6 @@ export function isBoardSolved(board, capacity) {
     }
     return true;
 }
-
 /**
  * 產生盤面的規範化（Canonical）唯一字串鍵值，利用試管排列不變性消除對稱狀態
  * @param {string[][]} board
@@ -32,7 +30,6 @@ export function serializeBoard(board) {
     tubeStrings.sort();
     return tubeStrings.join('|');
 }
-
 /**
  * 複製盤面資料
  * @param {string[][]} board
@@ -41,7 +38,6 @@ export function serializeBoard(board) {
 export function cloneBoard(board) {
     return board.map(tube => [...tube]);
 }
-
 /**
  * 計算試管頂部連續同色色塊的數量
  * @param {string[]} tube
@@ -60,7 +56,6 @@ export function getTopColorBlock(tube) {
     }
     return { color, count };
 }
-
 /**
  * 檢查單一試管是否已為完全裝滿的單色試管（完成態）
  * @param {string[]} tube
@@ -75,7 +70,6 @@ export function isTubeComplete(tube, capacity) {
     }
     return true;
 }
-
 /**
  * 計算指定盤面下的所有合法移動動作
  * @param {string[][]} board
@@ -85,26 +79,19 @@ export function isTubeComplete(tube, capacity) {
 export function getValidMoves(board, capacity) {
     const moves = [];
     const numTubes = board.length;
-
     for (let from = 0; from < numTubes; from++) {
         const srcTube = board[from];
         if (srcTube.length === 0) continue;
-
         // 若來源試管已是滿管純色，不再移出
         if (isTubeComplete(srcTube, capacity)) continue;
-
         const { color: srcColor, count: srcBlockCount } = getTopColorBlock(srcTube);
-
         // 若來源管內所有顏色都相同（且不是滿管），且要倒到空管，是無效的對稱移動
         const isSrcMonochromatic = srcBlockCount === srcTube.length;
         let seenEmptyTarget = false;
-
         for (let to = 0; to < numTubes; to++) {
             if (from === to) continue;
             const tgtTube = board[to];
-
             if (tgtTube.length === capacity) continue; // 目標管已滿
-
             if (tgtTube.length === 0) {
                 // 如果目標管為空管
                 if (isSrcMonochromatic) {
@@ -131,10 +118,8 @@ export function getValidMoves(board, capacity) {
             }
         }
     }
-
     return moves;
 }
-
 /**
  * 執行倒水動作並回傳新盤面
  * @param {string[][]} board
@@ -150,7 +135,6 @@ export function applyMove(board, move) {
     }
     return nextBoard;
 }
-
 /**
  * Exact Solver: 採用廣度優先搜尋 (BFS)，具有無權重圖最短路徑數學保證
  * @param {string[][]} initialBoard - 初始盤面
@@ -160,7 +144,6 @@ export function applyMove(board, move) {
  */
 export function solveExact(initialBoard, capacity, policy) {
     const startTime = Date.now();
-
     if (isBoardSolved(initialBoard, capacity)) {
         return {
             status: 'solved',
@@ -171,30 +154,24 @@ export function solveExact(initialBoard, capacity, policy) {
             elapsedMs: Date.now() - startTime
         };
     }
-
     const startKey = serializeBoard(initialBoard);
     const visited = new Set([startKey]);
-
     // 隊列項目: { board, path, depth }
     let queue = [{
         board: initialBoard,
         path: [],
         depth: 0
     }];
-
     let head = 0;
     let exploredNodes = 0;
-
     while (head < queue.length) {
         const current = queue[head++];
         exploredNodes++;
-
         // 定期截斷已訪問的隊列前端以釋放記憶體
         if (head > 8000) {
             queue = queue.slice(head);
             head = 0;
         }
-
         if (exploredNodes > policy.maxNodesPerAttempt) {
             return {
                 status: 'node_limit_exceeded',
@@ -205,16 +182,12 @@ export function solveExact(initialBoard, capacity, policy) {
                 elapsedMs: Date.now() - startTime
             };
         }
-
         if (current.depth >= policy.maxDepth) {
             continue;
         }
-
         const validMoves = getValidMoves(current.board, capacity);
-
         for (const move of validMoves) {
             const nextBoard = applyMove(current.board, move);
-
             if (isBoardSolved(nextBoard, capacity)) {
                 const finalPath = [...current.path, move];
                 return {
@@ -226,7 +199,6 @@ export function solveExact(initialBoard, capacity, policy) {
                     elapsedMs: Date.now() - startTime
                 };
             }
-
             const nextKey = serializeBoard(nextBoard);
             if (!visited.has(nextKey)) {
                 visited.add(nextKey);
@@ -238,7 +210,6 @@ export function solveExact(initialBoard, capacity, policy) {
             }
         }
     }
-
     return {
         status: 'unsolvable',
         optimalityProven: false,
@@ -248,7 +219,6 @@ export function solveExact(initialBoard, capacity, policy) {
         elapsedMs: Date.now() - startTime
     };
 }
-
 /**
  * Bounded Hint Solver: 快速啟發式搜尋，提供遊戲中即時提示
  * @param {string[][]} currentBoard
@@ -259,14 +229,12 @@ export function solveExact(initialBoard, capacity, policy) {
 export function solveBoundedHint(currentBoard, capacity, options = {}) {
     const maxNodes = options.maxNodes || 15000;
     const maxDepth = options.maxDepth || 60;
-
     const res = solveExact(currentBoard, capacity, {
         maxNodesPerAttempt: maxNodes,
         maxDepth,
         maxAttempts: 1,
         uiWatchdogMs: 1000
     });
-
     if (res.status === 'solved' && res.path.length > 0) {
         return res.path[0];
     }

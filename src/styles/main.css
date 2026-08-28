@@ -1,52 +1,50 @@
 /* ==========================================================================
    Liquid Cipher - Cyber-Lab Dark Tech Design System (main.css)
    ========================================================================== */
-
 :root {
     /* 核心背景色彩 (Background Tiers) */
-    --bg-void: #02040a;             /* 深邃虛空底色 */
-    --bg-base: #070d1d;             /* 科技暗藍底色 */
-    --bg-surface: #0c172e;          /* 表面容器底色 */
+    --bg-void: #02040a;
+    /* 深邃虛空底色 */
+    --bg-base: #070d1d;
+    /* 科技暗藍底色 */
+    --bg-surface: #0c172e;
+    /* 表面容器底色 */
     --bg-card: rgba(12, 23, 46, 0.72);
     --bg-card-elevated: rgba(18, 33, 66, 0.85);
     --bg-card-hover: rgba(25, 45, 88, 0.9);
-
     /* 邊框、光暈與分隔線 (Borders & Highlights) */
     --border-subtle: rgba(56, 189, 248, 0.15);
     --border-card: rgba(71, 85, 105, 0.35);
     --border-active: rgba(56, 189, 248, 0.65);
     --border-highlight: rgba(255, 255, 255, 0.12);
-
     /* 實驗室霓虹能量色譜 (Neon Energy Colors) */
     --neon-cyan: #38bdf8;
     --neon-cyan-dark: #0284c7;
     --neon-cyan-glow: rgba(56, 189, 248, 0.35);
-    
     --neon-emerald: #10b981;
     --neon-emerald-dark: #059669;
     --neon-emerald-glow: rgba(16, 185, 129, 0.4);
-    
     --neon-purple: #a855f7;
     --neon-purple-glow: rgba(168, 85, 247, 0.35);
-    
     --neon-amber: #f59e0b;
     --neon-amber-glow: rgba(245, 158, 11, 0.35);
-    
     --neon-rose: #f43f5e;
     --neon-rose-glow: rgba(244, 63, 94, 0.35);
-
     /* 文字色彩系統 (Typography Hierarchy) */
-    --text-primary: #f8fafc;        /* slate-50 */
-    --text-secondary: #94a3b8;      /* slate-400 */
-    --text-muted: #64748b;          /* slate-500 */
-    --text-accent: #38bdf8;         /* sky-400 */
-    --text-inverse: #020617;        /* slate-950 */
-
+    --text-primary: #f8fafc;
+    /* slate-50 */
+    --text-secondary: #94a3b8;
+    /* slate-400 */
+    --text-muted: #64748b;
+    /* slate-500 */
+    --text-accent: #38bdf8;
+    /* sky-400 */
+    --text-inverse: #020617;
+    /* slate-950 */
     /* 字型系統 (Typography Fonts) */
     --font-heading: 'Orbitron', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'Share Tech Mono', 'Courier New', monospace;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
     /* 圓角階梯 (Radius Scale) */
     --radius-xs: 4px;
     --radius-sm: 8px;
@@ -54,7 +52,6 @@
     --radius-lg: 18px;
     --radius-xl: 24px;
     --radius-pill: 9999px;
-
     /* 玻璃擬態與陰影 (Glassmorphism & Shadows) */
     --shadow-glass: 0 12px 40px 0 rgba(0, 0, 0, 0.55), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
     --shadow-glass-sm: 0 4px 16px 0 rgba(0, 0, 0, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
@@ -76,7 +73,8 @@ svg {
     fill: none;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     min-height: 100vh;
     min-height: 100dvh;
@@ -87,7 +85,7 @@ html, body {
 body {
     font-family: var(--font-sans);
     background-color: var(--bg-void);
-    background-image: 
+    background-image:
         radial-gradient(circle at 50% -10%, rgba(14, 165, 233, 0.18) 0%, transparent 65%),
         radial-gradient(circle at 90% 85%, rgba(168, 85, 247, 0.12) 0%, transparent 55%),
         radial-gradient(circle at 10% 75%, rgba(16, 185, 129, 0.09) 0%, transparent 50%),
@@ -106,7 +104,8 @@ body {
     padding-top: env(safe-area-inset-top, 0px);
 }
 
-button, [role="button"] {
+button,
+[role="button"] {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
@@ -163,7 +162,10 @@ button, [role="button"] {
 
 /* 無障礙減少動態 */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;

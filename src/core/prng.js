@@ -2,14 +2,12 @@
  * 液體解鎖 (Liquid Cipher) 確定性偽隨機數生成器
  * 採用標準 Mulberry32 演算法，支援單一 32-bit 整數種子初始化。
  */
-
 /**
  * 建立 Mulberry32 偽隨機數生成器實例
  * @param {number} seed - 32-bit unsigned integer (0 ~ 4294967295)
  */
 export function createPRNG(seed) {
     let s = (seed >>> 0);
-
     /**
      * 產生 [0, 1) 區間之均勻浮點數
      * @returns {number}
@@ -20,7 +18,6 @@ export function createPRNG(seed) {
         t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     }
-
     /**
      * 產生 [min, max] 區間之均勻整數 (包含 min 與 max)
      * @param {number} min
@@ -32,7 +29,6 @@ export function createPRNG(seed) {
         const hi = Math.max(min, max);
         return Math.floor(next() * (hi - lo + 1)) + lo;
     }
-
     /**
      * 使用 Fisher-Yates 演算法對陣列進行就地（in-place）確定性洗牌
      * @template T
@@ -48,7 +44,6 @@ export function createPRNG(seed) {
         }
         return array;
     }
-
     /**
      * 從陣列中隨機挑選一個元素
      * @template T
@@ -60,7 +55,6 @@ export function createPRNG(seed) {
         const index = nextInt(0, array.length - 1);
         return array[index];
     }
-
     return {
         next,
         nextInt,

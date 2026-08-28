@@ -2,7 +2,6 @@
  * 液體解鎖 (Liquid Cipher) 介面控制器
  * 負責 DOM 事件綁定、HUD 即時數據同步、高精度碼表計時器、使用者互動、鍵盤快捷鍵與彈窗生命週期。
  */
-
 export class UIController {
     /**
      * @param {import('../core/gameState.js').GameState} gameState
@@ -17,7 +16,6 @@ export class UIController {
         this.animationEngine = animationEngine;
         this.soundSynth = soundSynth;
         this.appHooks = appHooks;
-
         this.elements = {
             levelBadge: document.getElementById('hud-level-val'),
             specBadge: document.getElementById('hud-spec-val'),
@@ -50,13 +48,11 @@ export class UIController {
             btnCloseHelp: document.getElementById('btn-close-help'),
             btnAckHelp: document.getElementById('btn-ack-help')
         };
-
         this.timerInterval = null;
         this.timerStartTime = Date.now();
         this.timerRunning = false;
         this.hintTimeoutId = null;
     }
-
     /**
      * 初始化事件綁定
      */
@@ -67,7 +63,6 @@ export class UIController {
         this.startTimer();
         this.syncUI();
     }
-
     /**
      * 觸發行動端微觸覺反饋 (Haptic Feedback)
      * @param {number|number[]} pattern
@@ -77,9 +72,8 @@ export class UIController {
             if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
                 navigator.vibrate(pattern);
             }
-        } catch (_) {}
+        } catch (_) { }
     }
-
     /**
      * 處理試管點擊或快捷鍵選取
      * @param {number} hitId
@@ -89,9 +83,7 @@ export class UIController {
             this.animationEngine.selectedTubeId = null;
             return;
         }
-
         if (this.animationEngine.animState.isPouring) return;
-
         if (this.animationEngine.selectedTubeId === null) {
             const tube = this.gameState.currentBoard[hitId];
             if (tube && tube.length > 0) {
@@ -114,11 +106,9 @@ export class UIController {
                     this.animationEngine.hintMove = null;
                     this.soundSynth.playPour();
                     this.vibrate([20, 35, 20]);
-
                     this.animationEngine.startPourAnimation(srcId, hitId, check.amount, check.colorId, () => {
                         this.gameState.executePour(srcId, hitId);
                         this.syncUI();
-
                         // 檢查是否通關
                         if (this.gameState.isWon()) {
                             this.pauseTimer();
@@ -136,40 +126,60 @@ export class UIController {
             }
         }
     }
-
     /**
-     * 綁定 Canvas 滑鼠與觸控事件
+     * 綁定 Canvas 滑鼠與觸控事件 (統一 PointerEvent 杜絕雙重合成事件造成秒取消選取)
      */
     bindCanvasEvents() {
         const canvas = this.canvasManager.canvas;
-
         const onPointerDown = (clientX, clientY) => {
             if (this.animationEngine.animState.isPouring) return;
-            const hitId = this.canvasManager.hitTest(clientX, clientY);
+            const hitId = this.canvasManager.hitTest(clientX, clientY, this.animationEngine.selectedTubeId);
             this.handleTubeSelectOrPour(hitId);
         };
-
-        canvas.addEventListener('mousedown', (e) => {
-            onPointerDown(e.clientX, e.clientY);
-        });
-
-        canvas.addEventListener('mousemove', (e) => {
-            if (this.animationEngine.animState.isPouring) return;
-            this.animationEngine.hoverTubeId = this.canvasManager.hitTest(e.clientX, e.clientY);
-        });
-
-        canvas.addEventListener('mouseleave', () => {
-            this.animationEngine.hoverTubeId = null;
-        });
-
-        canvas.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 0) {
-                const t = e.touches[0];
-                onPointerDown(t.clientX, t.clientY);
-            }
-        }, { passive: true });
+        if (typeof window !== 'undefined' && window.PointerEvent) {
+            canvas.addEventListener('pointerdown', (e) => {
+                if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+                onPointerDown(e.clientX, e.clientY);
+            });
+            canvas.addEventListener('pointermove', (e) => {
+                if (this.animationEngine.animState.isPouring) return;
+                if (e.pointerType === 'mouse') {
+                    this.animationEngine.hoverTubeId = this.canvasManager.hitTest(
+                        e.clientX,
+                        e.clientY,
+                        this.animationEngine.selectedTubeId
+                    );
+                }
+            });
+            canvas.addEventListener('pointerleave', () => {
+                this.animationEngine.hoverTubeId = null;
+            });
+        } else {
+            let lastTouchTime = 0;
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 0) {
+                    lastTouchTime = Date.now();
+                    const t = e.touches[0];
+                    onPointerDown(t.clientX, t.clientY);
+                }
+            }, { passive: true });
+            canvas.addEventListener('mousedown', (e) => {
+                if (Date.now() - lastTouchTime < 600) return;
+                onPointerDown(e.clientX, e.clientY);
+            });
+            canvas.addEventListener('mousemove', (e) => {
+                if (this.animationEngine.animState.isPouring) return;
+                this.animationEngine.hoverTubeId = this.canvasManager.hitTest(
+                    e.clientX,
+                    e.clientY,
+                    this.animationEngine.selectedTubeId
+                );
+            });
+            canvas.addEventListener('mouseleave', () => {
+                this.animationEngine.hoverTubeId = null;
+            });
+        }
     }
-
     /**
      * 綁定控制按鈕群事件
      */
@@ -185,7 +195,6 @@ export class UIController {
                 this.triggerUndo();
             });
         }
-
         // 重做 (桌機 & 行動端)
         if (this.elements.btnRedo) {
             this.elements.btnRedo.addEventListener('click', () => {
@@ -197,7 +206,6 @@ export class UIController {
                 this.triggerRedo();
             });
         }
-
         // 重置本關 (桌機 & 行動端)
         if (this.elements.btnRestart) {
             this.elements.btnRestart.addEventListener('click', () => {
@@ -209,7 +217,6 @@ export class UIController {
                 this.triggerRestart();
             });
         }
-
         // 智能提示 (桌機 & 行動端)
         if (this.elements.btnHint) {
             this.elements.btnHint.addEventListener('click', () => {
@@ -221,41 +228,35 @@ export class UIController {
                 this.triggerHint();
             });
         }
-
         // 色盲模式切換
         if (this.elements.btnColorBlind) {
             this.elements.btnColorBlind.addEventListener('click', () => {
                 this.triggerColorBlindToggle();
             });
         }
-
         // 音效切換
         if (this.elements.btnSound) {
             this.elements.btnSound.addEventListener('click', () => {
                 this.triggerSoundToggle();
             });
         }
-
         // 開啟說明協議
         if (this.elements.btnHelp) {
             this.elements.btnHelp.addEventListener('click', () => {
                 this.showHelpModal();
             });
         }
-
         // 關閉說明協議
         if (this.elements.btnCloseHelp) {
             this.elements.btnCloseHelp.addEventListener('click', () => {
                 this.hideHelpModal();
             });
         }
-
         if (this.elements.btnAckHelp) {
             this.elements.btnAckHelp.addEventListener('click', () => {
                 this.hideHelpModal();
             });
         }
-
         // 勝利彈窗 - 下一關
         if (this.elements.btnNextLevel) {
             this.elements.btnNextLevel.addEventListener('click', () => {
@@ -266,7 +267,6 @@ export class UIController {
                 }
             });
         }
-
         // 勝利彈窗 - 重玩本關
         if (this.elements.btnReplayLevel) {
             this.elements.btnReplayLevel.addEventListener('click', () => {
@@ -278,14 +278,12 @@ export class UIController {
             });
         }
     }
-
     /**
      * 綁定全局鍵盤快捷鍵
      */
     bindKeyboardShortcuts() {
         window.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
-
             // 若目前在勝利彈窗
             if (this.elements.winModal && this.elements.winModal.classList.contains('show')) {
                 if (key === 'enter' || key === ' ') {
@@ -300,7 +298,6 @@ export class UIController {
                 }
                 return;
             }
-
             // 若在說明彈窗
             if (this.elements.helpModal && this.elements.helpModal.classList.contains('show')) {
                 if (key === 'escape' || key === 'enter' || key === ' ') {
@@ -309,7 +306,6 @@ export class UIController {
                     return;
                 }
             }
-
             // 全局快捷鍵
             if (key === 'z' && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
@@ -320,43 +316,36 @@ export class UIController {
                 }
                 return;
             }
-
             if (key === 'z' && !e.ctrlKey && !e.metaKey) {
                 e.preventDefault();
                 this.triggerUndo();
                 return;
             }
-
             if (key === 'y') {
                 e.preventDefault();
                 this.triggerRedo();
                 return;
             }
-
             if (key === 'r') {
                 e.preventDefault();
                 this.triggerRestart();
                 return;
             }
-
             if (key === 'h') {
                 e.preventDefault();
                 this.triggerHint();
                 return;
             }
-
             if (key === 'c') {
                 e.preventDefault();
                 this.triggerColorBlindToggle();
                 return;
             }
-
             if (key === 'm') {
                 e.preventDefault();
                 this.triggerSoundToggle();
                 return;
             }
-
             if (key === '?' || key === '/') {
                 e.preventDefault();
                 if (this.elements.helpModal && this.elements.helpModal.classList.contains('show')) {
@@ -366,13 +355,11 @@ export class UIController {
                 }
                 return;
             }
-
             if (key === 'escape') {
                 this.animationEngine.selectedTubeId = null;
                 this.hideHelpModal();
                 return;
             }
-
             // 數字鍵 1 ~ 9 快速選管
             const num = parseInt(key, 10);
             if (!isNaN(num) && num >= 1 && num <= 9) {
@@ -384,7 +371,6 @@ export class UIController {
             }
         });
     }
-
     triggerUndo() {
         if (this.animationEngine.animState.isPouring) return;
         if (this.gameState.undo()) {
@@ -397,7 +383,6 @@ export class UIController {
             this.soundSynth.playError();
         }
     }
-
     triggerRedo() {
         if (this.animationEngine.animState.isPouring) return;
         if (this.gameState.redo()) {
@@ -410,7 +395,6 @@ export class UIController {
             this.soundSynth.playError();
         }
     }
-
     triggerRestart() {
         if (this.animationEngine.animState.isPouring) return;
         this.soundSynth.playClick();
@@ -421,7 +405,6 @@ export class UIController {
         this.animationEngine.hintMove = null;
         this.syncUI();
     }
-
     triggerHint() {
         if (this.animationEngine.animState.isPouring) return;
         this.soundSynth.playHint();
@@ -430,7 +413,6 @@ export class UIController {
             this.appHooks.onRequestHint();
         }
     }
-
     triggerColorBlindToggle() {
         this.gameState.colorBlindMode = !this.gameState.colorBlindMode;
         this.gameState.persistSaveData();
@@ -438,14 +420,12 @@ export class UIController {
         this.vibrate(10);
         this.syncUI();
     }
-
     triggerSoundToggle() {
         const enabled = this.soundSynth.toggle();
         this.gameState.soundEnabled = enabled;
         this.gameState.persistSaveData();
         this.syncUI();
     }
-
     /**
      * 啟動/重啟高精度碼表計時器
      */
@@ -460,7 +440,6 @@ export class UIController {
         }, 200);
         this.updateTimerDisplay();
     }
-
     /**
      * 暫停碼表計時器
      */
@@ -471,7 +450,6 @@ export class UIController {
             this.timerInterval = null;
         }
     }
-
     /**
      * 停止計時器
      */
@@ -482,7 +460,6 @@ export class UIController {
             this.timerInterval = null;
         }
     }
-
     /**
      * 重設計時器並重新從 0 計時
      */
@@ -493,7 +470,6 @@ export class UIController {
         this.updateTimerDisplay();
         this.startTimer();
     }
-
     /**
      * 更新計時器顯示
      */
@@ -504,7 +480,6 @@ export class UIController {
         const s = String(totalSec % 60).padStart(2, '0');
         this.elements.timer.textContent = `${m}:${s}`;
     }
-
     /**
      * 同步介面數據與按鈕狀態
      */
@@ -512,24 +487,20 @@ export class UIController {
         if (this.elements.levelBadge) {
             this.elements.levelBadge.textContent = `LEVEL ${this.gameState.activeLevel}`;
         }
-
         if (this.elements.specBadge && this.gameState.currentLevelDef) {
             const def = this.gameState.currentLevelDef;
             const colors = def.colorCount || new Set(def.initialBoard.flat().filter(Boolean)).size;
             const tubes = this.gameState.currentBoard.length || def.initialBoard.length;
             this.elements.specBadge.textContent = `${colors} 色 · ${tubes} 管`;
         }
-
         const optimal = this.gameState.currentLevelDef ? this.gameState.currentLevelDef.knownOptimalSteps : 0;
         const moves = this.gameState.moveCount;
-
         if (this.elements.optimalSteps) {
             this.elements.optimalSteps.textContent = optimal > 0 ? String(optimal) : '--';
         }
         if (this.elements.currentMoves) {
             this.elements.currentMoves.textContent = String(moves);
         }
-
         // 更新效率評級標籤
         if (this.elements.ratingPill) {
             if (moves === 0) {
@@ -546,36 +517,29 @@ export class UIController {
                 this.elements.ratingPill.classList.add('over');
             }
         }
-
         const canUndo = this.gameState.moveHistory.length > 0;
         const canRedo = this.gameState.redoHistory.length > 0;
-
         if (this.elements.btnUndo) {
             this.elements.btnUndo.disabled = !canUndo;
         }
         if (this.elements.btnMobileUndo) {
             this.elements.btnMobileUndo.disabled = !canUndo;
         }
-
         if (this.elements.btnRedo) {
             this.elements.btnRedo.disabled = !canRedo;
         }
         if (this.elements.btnMobileRedo) {
             this.elements.btnMobileRedo.disabled = !canRedo;
         }
-
         if (this.elements.btnColorBlind) {
             this.elements.btnColorBlind.classList.toggle('active', this.gameState.colorBlindMode);
         }
-
         if (this.elements.soundIconOn && this.elements.soundIconOff) {
             this.elements.soundIconOn.style.display = this.soundSynth.enabled ? 'block' : 'none';
             this.elements.soundIconOff.style.display = this.soundSynth.enabled ? 'none' : 'block';
         }
-
         this.updateTimerDisplay();
     }
-
     /**
      * 展現提示動作
      * @param {import('../core/types.js').MoveAction} move
@@ -588,7 +552,6 @@ export class UIController {
             this.animationEngine.hintMove = null;
         }, 4000);
     }
-
     /**
      * 顯示加載中遮罩
      */
@@ -598,7 +561,6 @@ export class UIController {
             this.elements.loadingOverlay.style.display = 'flex';
         }
     }
-
     /**
      * 隱藏加載中遮罩
      */
@@ -608,17 +570,14 @@ export class UIController {
         }
         this.startTimer();
     }
-
     /**
      * 展現通關結算彈窗
      */
     showWinModal() {
         if (!this.elements.winModal) return;
         this.pauseTimer();
-
         const moves = this.gameState.moveCount;
         const optimal = this.gameState.currentLevelDef ? this.gameState.currentLevelDef.knownOptimalSteps : 0;
-
         if (this.elements.modalMovesVal) {
             this.elements.modalMovesVal.textContent = String(moves);
         }
@@ -631,7 +590,6 @@ export class UIController {
             const s = String(totalSec % 60).padStart(2, '0');
             this.elements.modalTimeVal.textContent = `${m}:${s}`;
         }
-
         // 計算通關評級
         if (this.elements.modalRatingBadge) {
             if (optimal > 0 && moves <= optimal) {
@@ -645,10 +603,8 @@ export class UIController {
                 this.elements.modalRatingBadge.style.background = 'linear-gradient(135deg, #f59e0b, #ea580c)';
             }
         }
-
         this.elements.winModal.classList.add('show');
     }
-
     /**
      * 關閉通關結算彈窗
      */
@@ -657,7 +613,6 @@ export class UIController {
             this.elements.winModal.classList.remove('show');
         }
     }
-
     /**
      * 展現說明協議彈窗
      */
@@ -667,7 +622,6 @@ export class UIController {
             this.soundSynth.playClick();
         }
     }
-
     /**
      * 關閉說明協議彈窗
      */

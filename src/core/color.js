@@ -1,12 +1,9 @@
 /**
  * 液體解鎖 (Liquid Cipher) 色彩與試劑工具模組
  */
-
 import { REAGENTS } from './constants.js';
-
 // 建立 ID 快速索引表
 const REAGENT_MAP = new Map(REAGENTS.map(r => [r.id, r]));
-
 /**
  * 依據 ID 取得試劑定義
  * @param {string} id
@@ -19,7 +16,6 @@ export function getReagentById(id) {
     }
     return r;
 }
-
 /**
  * 將試劑 ID 轉換為 RGBA 字串
  * @param {string} id - 試劑 ID
@@ -30,7 +26,6 @@ export function getReagentRgbaStr(id, alpha = 1.0) {
     const r = getReagentById(id);
     return `rgba(${r.rgb[0]}, ${r.rgb[1]}, ${r.rgb[2]}, ${alpha})`;
 }
-
 /**
  * 計算兩種色彩之相對亮度
  * @param {number[]} rgb - [R, G, B]
@@ -43,7 +38,6 @@ export function getRelativeLuminance(rgb) {
     });
     return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
 }
-
 /**
  * 計算前景色與背景色對比度 (符合 WCAG 2.1 標準)
  * @param {number[]} rgb1
@@ -57,7 +51,6 @@ export function getContrastRatio(rgb1, rgb2) {
     const darkest = Math.min(lum1, lum2);
     return (brightest + 0.05) / (darkest + 0.05);
 }
-
 /**
  * 取得適合在該試劑顏色背景上的文字顏色 ('#FFFFFF' 或 '#0F172A')
  * @param {string} id - 試劑 ID
@@ -71,7 +64,6 @@ export function getAccessibleTextColor(id) {
     const ratioDark = getContrastRatio(r.rgb, darkRgb);
     return ratioWhite >= ratioDark ? '#FFFFFF' : '#0F172A';
 }
-
 /**
  * 取得該試劑對應之色盲輔助標記字串
  * @param {string} id - 試劑 ID

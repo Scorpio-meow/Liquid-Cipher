@@ -1,7 +1,6 @@
 /**
  * 液體解鎖 (Liquid Cipher) JSDoc 資料型別定義
  */
-
 /**
  * @typedef {Object} Reagent
  * @property {string} id - 試劑識別代碼 (e.g. 'crimson')
@@ -11,7 +10,6 @@
  * @property {string} symbol - 色盲輔助符號代碼 (e.g. 'R1')
  * @property {string} description - 試劑描述
  */
-
 /**
  * @typedef {Object} LevelParams
  * @property {number} level - 關卡序號 L (L >= 1)
@@ -24,7 +22,6 @@
  * @property {number} maxSteps - 預期最少解法步數上限 MaxSteps(L)
  * @property {string[]} availableShapes - 該關卡可解鎖之試管造型清單
  */
-
 /**
  * @typedef {Object} SolverProof
  * @property {string} algorithm - 搜尋演算法名稱 (e.g. 'bfs', 'bidirectional-bfs')
@@ -33,7 +30,6 @@
  * @property {number} maxNodesPolicy - 節點上限常數
  * @property {number} [elapsedMs] - 搜尋耗時 (毫秒)
  */
-
 /**
  * @typedef {Object} MoveAction
  * @property {number} from - 來源試管索引
@@ -41,7 +37,6 @@
  * @property {number} amount - 傾倒容量單位 (整數)
  * @property {string} colorId - 傾倒試劑 ID
  */
-
 /**
  * @typedef {Object} LevelDefinition
  * @property {number} schemaVersion - 資料架構版本
@@ -58,7 +53,6 @@
  * @property {SolverProof} solverProof - 求解器證明中繼資料
  * @property {MoveAction[]} [optimalPath] - 最優解路徑 (可選)
  */
-
 /**
  * @typedef {Object} SolverResult
  * @property {'solved'|'node_limit_exceeded'|'depth_exceeded'|'unsolvable'} status - 求解狀態
@@ -68,7 +62,6 @@
  * @property {number} exploredNodes - 探索節點數
  * @property {number} elapsedMs - 耗時毫秒
  */
-
 /**
  * @typedef {Object} SaveData
  * @property {number} schemaVersion - 存檔結構版本
@@ -86,5 +79,4 @@
  * @property {boolean} colorBlindMode - 色盲模式開關狀態
  * @property {boolean} soundEnabled - 音效開關狀態
  */
-
 export const TYPE_GUARD = true;

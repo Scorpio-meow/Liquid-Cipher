@@ -1,7 +1,6 @@
 /**
  * 液體解鎖 (Liquid Cipher) 實驗室幾何玻璃儀器向量路徑定義
  */
-
 /**
  * 繪製特定形狀的試管玻璃外輪廓路徑
  * @param {CanvasRenderingContext2D} ctx
@@ -13,7 +12,6 @@
  */
 export function defineTubePath(ctx, x, y, w, h, shape = 'cylinder') {
     ctx.beginPath();
-
     if (shape === 'cylinder') {
         const r = Math.min(18, w / 2);
         ctx.moveTo(x - w / 2, y - h);

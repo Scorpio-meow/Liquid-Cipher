@@ -2,7 +2,6 @@
  * 液體解鎖 (Liquid Cipher) 32-bit 字串雜湊函式
  * 採用標準 FNV-1a (32-bit) 演算法，將字串穩定對應為 unsigned 32-bit 整數。
  */
-
 /**
  * 計算字串的 32-bit FNV-1a 雜湊值
  * @param {string} str - 輸入字串
@@ -18,7 +17,6 @@ export function hash32(str) {
     }
     return hash >>> 0;
 }
-
 /**
  * 依據版本、關卡序號與嘗試次數派生確定性 32-bit 種子
  * @param {string} prefix - 根前綴 (e.g. 'liquid-cipher:v1')
