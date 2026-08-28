@@ -4,19 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>液體解鎖 (Liquid Cipher) - 實驗室色彩解密矩陣</title>
-    <!-- Google Fonts: Orbitron, Inter & Share Tech Mono -->
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/x-icon" href="./logo/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="./logo/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./logo/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./logo/apple-touch-icon.png">
+    <meta name="theme-color" content="#02040a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LiquidCipher">
+    <meta name="description" content="結合 Cyber-Lab 視覺風格與狀態空間搜尋求解器的單一路徑無限線性化學試劑解密遊戲。">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
-    <!-- Cyber-Lab Dark Tech Styles -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="./src/styles/main.css">
     <link rel="stylesheet" href="./src/styles/components.css">
 </head>
 
 <body>
-    <!-- 頂部品牌與控制欄 -->
     <header class="site-header">
         <div class="brand-section">
             <div class="brand-icon" aria-hidden="true">
@@ -36,68 +43,79 @@
                 <p class="brand-subtitle">單一路徑無限 Water Sort 解密實驗室</p>
             </div>
         </div>
-
-        <!-- 頂部操作按鈕群 -->
         <div class="action-buttons">
             <button id="btn-undo" class="btn-action" title="復原上一步 (快捷鍵: Z)" aria-label="復原上一步">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                 </svg>
                 <span>復原</span>
                 <kbd class="key-badge">Z</kbd>
             </button>
             <button id="btn-redo" class="btn-action" title="重做下一步 (快捷鍵: Y)" aria-label="重做下一步">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
                 </svg>
                 <span>重做</span>
                 <kbd class="key-badge">Y</kbd>
             </button>
             <button id="btn-restart" class="btn-action" title="重置本關 (快捷鍵: R)" aria-label="重置本關">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H19" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 <span>重置</span>
                 <kbd class="key-badge">R</kbd>
             </button>
             <button id="btn-hint" class="btn-action btn-accent-hint" title="智能提示最佳下一步 (快捷鍵: H)" aria-label="智能提示最佳下一步">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 <span>提示</span>
                 <kbd class="key-badge">H</kbd>
             </button>
             <button id="btn-colorblind" class="btn-action" title="切換色盲無障礙符號標籤 (快捷鍵: C)" aria-label="切換色盲無障礙符號標籤">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
                 <span>色標</span>
                 <kbd class="key-badge">C</kbd>
             </button>
             <button id="btn-sound" class="btn-action" title="切換程序化音效 (快捷鍵: M)" aria-label="切換程序化音效">
                 <svg id="sound-icon-on" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                 </svg>
                 <svg id="sound-icon-off" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                 </svg>
                 <kbd class="key-badge">M</kbd>
             </button>
+            <button id="btn-install-pwa" class="btn-action btn-accent-install" style="display: none;"
+                title="安裝應用程式至桌面 (PWA)" aria-label="安裝應用程式至桌面">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>安裝 APP</span>
+            </button>
             <button id="btn-help" class="btn-action btn-icon-only" title="實驗室協議與操作說明 (快捷鍵: ?)" aria-label="實驗室協議與操作說明">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <kbd class="key-badge">?</kbd>
             </button>
         </div>
     </header>
-
-    <!-- 主遊戲介面 -->
     <main class="game-main app-container">
-        <!-- 狀態 HUD 遙測儀表欄 -->
         <div class="hud-telemetry-container glass-panel">
-            <!-- 關卡與難度資訊 -->
             <div class="hud-card hud-card-level">
                 <div class="hud-card-header">
                     <span class="hud-label-dot"></span>
@@ -108,8 +126,6 @@
                     <span class="hud-meta-badge mono-text" id="hud-spec-val">3 色 · 5 管</span>
                 </div>
             </div>
-            
-            <!-- 步數與解法效率 -->
             <div class="hud-card hud-card-moves">
                 <div class="hud-card-header">
                     <span class="hud-caption mono-text">EFFICIENCY / PAR</span>
@@ -127,8 +143,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 計時器 -->
             <div class="hud-card hud-card-chrono">
                 <div class="hud-card-header">
                     <div class="hud-card-title-group">
@@ -140,24 +154,16 @@
                 <div class="hud-timer-display mono-text" id="hud-timer-val">00:00</div>
             </div>
         </div>
-
-        <!-- Canvas 渲染隔離艙容器 -->
         <div class="canvas-wrapper">
-            <!-- 科技邊角標記 -->
             <div class="chamber-corner tl" aria-hidden="true"></div>
             <div class="chamber-corner tr" aria-hidden="true"></div>
             <div class="chamber-corner bl" aria-hidden="true"></div>
             <div class="chamber-corner br" aria-hidden="true"></div>
-
-            <!-- 隔離艙頂部狀態條 -->
             <div class="chamber-status-bar mono-text" aria-hidden="true">
                 <span class="chamber-tag">CONTAINMENT CHAMBER // QUANTUM SORT MATRIX</span>
                 <span class="chamber-hint">點擊試管選取 · 鍵盤 1-9 快捷選取</span>
             </div>
-
             <canvas id="game-canvas" width="860" height="480"></canvas>
-
-            <!-- 關卡矩陣生成與求解加載中遮罩 -->
             <div id="loading-overlay" class="loading-overlay" style="display: none;">
                 <div class="loading-holo-spinner">
                     <div class="holo-ring outer"></div>
@@ -171,8 +177,6 @@
             </div>
         </div>
     </main>
-
-    <!-- 頁尾宣告 -->
     <footer class="site-footer">
         <div class="footer-content mono-text">
             <span>LIQUID CIPHER LAB // ENGINE v1.0.0</span>
@@ -180,8 +184,6 @@
             <span>NATIVE ES MODULES · HIGH-DPI CANVAS · WEB WORKER · WEB AUDIO</span>
         </div>
     </footer>
-
-    <!-- 通關勝利結算彈窗 -->
     <div id="win-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-card win-card glass-panel">
             <div class="modal-header-glow"></div>
@@ -193,11 +195,9 @@
                     </svg>
                 </div>
             </div>
-
             <div class="modal-rank-badge tech-heading" id="modal-rating-badge">RANK S</div>
             <h2 id="modal-title" class="modal-title tech-heading">MATRIX DECRYPTED</h2>
             <p class="modal-desc">化學試劑已成功分離！所有反應物皆已回歸純淨平衡態。</p>
-
             <div class="modal-stats-grid mono-text">
                 <div class="modal-stat-cell">
                     <div class="modal-stat-label">實際步數</div>
@@ -212,7 +212,6 @@
                     <div class="modal-stat-value" id="modal-time-val">00:00</div>
                 </div>
             </div>
-
             <div class="modal-actions">
                 <button id="btn-next-level" class="btn-primary-action">
                     <span>解鎖並進入下一關</span>
@@ -225,21 +224,18 @@
             </div>
         </div>
     </div>
-
-    <!-- 實驗室操作協議與說明彈窗 -->
     <div id="help-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="help-title">
         <div class="modal-card help-card glass-panel">
             <div class="modal-top-bar">
                 <div class="modal-tag mono-text">LABORATORY PROTOCOL</div>
                 <button id="btn-close-help" class="btn-close-modal" aria-label="關閉說明">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-
             <h2 id="help-title" class="help-modal-title tech-heading">色彩分離操作指南</h2>
-            
             <div class="help-scroll-content">
                 <div class="help-section">
                     <h3 class="help-section-title tech-heading">1. 試劑傾倒基本法則</h3>
@@ -249,7 +245,6 @@
                         <li><strong>通關條件</strong>：所有試劑皆已依色彩歸類於獨立試管，且無任何試管存在雜色混合。</li>
                     </ul>
                 </div>
-
                 <div class="help-section">
                     <h3 class="help-section-title tech-heading">2. 全套鍵盤快捷鍵</h3>
                     <div class="shortcuts-grid mono-text">
@@ -263,21 +258,28 @@
                         <div class="shortcut-item"><kbd>?</kbd><span>開啟/關閉本說明協議</span></div>
                     </div>
                 </div>
-
                 <div class="help-section">
                     <h3 class="help-section-title tech-heading">3. 三重門禁與無限挑戰</h3>
-                    <p class="help-text">所有發布盤面均由背景 Web Worker 進行 BFS 最短解證明（Exact Solver），保證 100% 絕對可解且步數落在目標難度區間，享受純粹且無極限的邏輯推理！</p>
+                    <p class="help-text">所有發布盤面均由背景 Web Worker 進行 BFS 最短解證明（Exact Solver），保證 100%
+                        絕對可解且步數落在目標難度區間，享受純粹且無極限的邏輯推理！</p>
                 </div>
             </div>
-
             <button id="btn-ack-help" class="btn-primary-action">
                 <span>我已瞭解實驗協議，開始解密</span>
                 <kbd class="key-badge-light">Esc / Enter</kbd>
             </button>
         </div>
     </div>
-
-    <!-- 程式進入點 -->
+    <div id="pwa-update-toast" class="pwa-update-toast" role="alert" style="display: none;">
+        <div class="toast-content">
+            <span class="toast-pulse-dot"></span>
+            <div class="toast-text-group">
+                <span class="toast-title tech-heading">SYSTEM CORE UPDATED</span>
+                <span class="toast-desc">實驗室核心已更新，點擊立即套用新版本</span>
+            </div>
+        </div>
+        <button id="btn-reload-pwa" class="btn-action btn-toast-reload">立即重載</button>
+    </div>
     <script type="module" src="./src/main.js"></script>
 </body>
 

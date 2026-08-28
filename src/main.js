@@ -44,6 +44,7 @@ class App {
     async init() {
         this.initWorker();
         this.initResizeHandler();
+        this.initPWA();
 
         // 讀取存檔
         const hasSavedData = this.gameState.loadSaveData();
@@ -56,9 +57,12 @@ class App {
         this.animationEngine.start();
         this.uiController.init();
 
-        // 載入當前目標關卡
+        // 載入當前目標關卡 (若有未完成盤面則還原)
         const targetLevel = this.gameState.activeLevel;
-        await this.loadLevel(targetLevel);
+        const resumeBoard = hasSavedData && this.gameState.currentBoard && this.gameState.currentBoard.length > 0
+            ? this.gameState.currentBoard
+            : null;
+        await this.loadLevel(targetLevel, resumeBoard);
     }
 
     /**
@@ -85,6 +89,10 @@ class App {
 
             this.worker.onerror = (err) => {
                 console.warn('Web Worker 運行受限，將無縫切換為同步備援運算:', err);
+                for (const [id, resolver] of this.pendingRequests) {
+                    resolver.reject(err);
+                }
+                this.pendingRequests.clear();
                 this.worker = null;
             };
         } catch (e) {
@@ -126,8 +134,9 @@ class App {
     /**
      * 載入並發布指定關卡
      * @param {number} level
+     * @param {string[][]} [resumeBoard] - 可選的還原盤面
      */
-    async loadLevel(level) {
+    async loadLevel(level, resumeBoard = null) {
         this.uiController.showLoading();
 
         try {
@@ -143,7 +152,7 @@ class App {
             }
 
             // 3. 套用至遊戲狀態機
-            this.gameState.applyLevelDefinition(levelDef);
+            this.gameState.applyLevelDefinition(levelDef, resumeBoard);
 
             // 4. 計算排版並同步 UI
             this.canvasManager.computeLayout(levelDef.initialBoard.length, levelDef.tubeShapes);
@@ -151,7 +160,7 @@ class App {
         } catch (err) {
             console.error('關卡載入異常，載入備援盤面:', err);
             const fallbackDef = generateLevel(level);
-            this.gameState.applyLevelDefinition(fallbackDef);
+            this.gameState.applyLevelDefinition(fallbackDef, resumeBoard);
             this.canvasManager.computeLayout(fallbackDef.initialBoard.length, fallbackDef.tubeShapes);
             this.uiController.syncUI();
         } finally {
@@ -199,6 +208,91 @@ class App {
             console.warn('求解提示異常:', err);
             this.soundSynth.playError();
         }
+    }
+
+    /**
+     * 初始化 PWA Service Worker、安裝提示與更新監聽
+     */
+    initPWA() {
+        if (!('serviceWorker' in navigator)) return;
+
+        const btnInstall = document.getElementById('btn-install-pwa');
+        const updateToast = document.getElementById('pwa-update-toast');
+        const btnReload = document.getElementById('btn-reload-pwa');
+
+        let deferredPrompt = null;
+        let waitingWorker = null;
+
+        // 監聽 PWA 安裝提示事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (btnInstall) {
+                btnInstall.style.display = 'inline-flex';
+            }
+        });
+
+        // 監聽應用程式成功安裝
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            if (btnInstall) {
+                btnInstall.style.display = 'none';
+            }
+        });
+
+        // 點擊自訂安裝按鈕
+        if (btnInstall) {
+            btnInstall.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                btnInstall.style.display = 'none';
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            });
+        }
+
+        // 註冊 Service Worker
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then((registration) => {
+                // 檢查是否有正在等待啟用的新版本
+                if (registration.waiting) {
+                    waitingWorker = registration.waiting;
+                    if (updateToast) updateToast.style.display = 'flex';
+                }
+
+                // 監聽新版本發現事件
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    if (!newWorker) return;
+
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            waitingWorker = newWorker;
+                            if (updateToast) updateToast.style.display = 'flex';
+                        }
+                    });
+                });
+            }).catch((err) => {
+                console.warn('PWA Service Worker 註冊受限:', err);
+            });
+        });
+
+        // 點擊「立即重載」套用新版本
+        if (btnReload) {
+            btnReload.addEventListener('click', () => {
+                if (waitingWorker) {
+                    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+            });
+        }
+
+        // 當 controller 變更時自動重新載入頁面
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+        });
     }
 
     /**

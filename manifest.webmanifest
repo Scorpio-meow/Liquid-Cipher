@@ -1,0 +1,51 @@
+{
+  "name": "液體解鎖 (Liquid Cipher)",
+  "short_name": "LiquidCipher",
+  "description": "結合 Cyber-Lab 視覺風格與狀態空間搜尋求解器的單一路徑無限線性化學試劑解密遊戲。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#02040a",
+  "theme_color": "#02040a",
+  "categories": [
+    "games",
+    "puzzle"
+  ],
+  "icons": [
+    {
+      "src": "./logo/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "./logo/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "./logo/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./logo/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

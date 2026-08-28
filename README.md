@@ -1,6 +1,7 @@
 # 液體解鎖 (Liquid Cipher) - 實驗室色彩解密矩陣
 
 [![Language](https://img.shields.io/badge/Language-HTML5%20%2F%20CSS3%20%2F%20JavaScript-blue)](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript)
+[![PWA](https://img.shields.io/badge/PWA-Installable%20%26%20Offline-blueviolet)](./manifest.webmanifest)
 [![Architecture](https://img.shields.io/badge/Architecture-Native%20ES%20Modules-purple)](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Guide/Modules)
 [![Graphics](https://img.shields.io/badge/Graphics-High--DPI%20Canvas%202D-red)](https://developer.mozilla.org/zh-TW/docs/Web/API/Canvas_API)
 [![Worker](https://img.shields.io/badge/Computation-Dedicated%20Web%20Worker-teal)](https://developer.mozilla.org/zh-TW/docs/Web/API/Web_Workers_API)
@@ -9,15 +10,15 @@
 [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%202.1%20Compliant-success)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 [![License](https://img.shields.io/badge/License-MIT-green)](./LICENSE)
 
-液體解鎖 (Liquid Cipher) 是一款結合 Cyber-Lab Dark Tech 視覺風格、High-DPI HTML5 Canvas 2D 流體渲染與 Web Audio API 程序化音效合成的單一路徑無限線性 Water Sort 化學試劑解密網頁遊戲。
+液體解鎖 (Liquid Cipher) 是一款結合 Cyber-Lab Dark Tech 視覺風格、High-DPI HTML5 Canvas 2D 流體渲染、Web Audio API 程序化音效合成與 PWA 漸進式離線安裝能力的單一路徑無限線性 Water Sort 化學試劑解密網頁遊戲。
 
-玩家扮演尖端實驗室研究員，依循色彩分離排序邏輯，將各個試管中的化學試劑進行整理，使每個試管均回歸單一純色或完全清空。本專案完全基於原生現代網頁技術開發，零外部建置或框架依賴，透過獨立 Web Worker 在背景執行狀態空間搜尋（BFS Exact Solver）與關卡生成管線，確保畫面渲染維持極致 60fps 流暢度。
+玩家扮演尖端實驗室研究員，依循色彩分離排序邏輯，將各個試管中的化學試劑進行整理，使每個試管均回歸單一純色或完全清空。本專案完全基於原生現代網頁技術開發，零外部建置或框架依賴，透過獨立 Web Worker 在背景執行狀態空間搜尋（BFS Exact Solver）與關卡生成管線，並支援 Service Worker 100% 離線即開即玩與獨立桌面/手機應用程式安裝。
 
 ---
 
 ## 快速開始
 
-本專案為零建置依賴的單頁應用程式（SPA），支援以下方式啟動與運行：
+本專案為支援 PWA 的零建置單頁應用程式（SPA），支援以下方式啟動與運行：
 
 ### 方法一：使用 Bun 靜態伺服器（推薦）
 
@@ -29,7 +30,13 @@ bunx serve .
 
 伺服器啟動後，依據終端機輸出的網址（通常為 `http://localhost:3000`）在瀏覽器中開啟即可。
 
-### 方法二：直接瀏覽器開啟
+### 方法二：PWA 應用程式安裝至桌面 / 行動裝置
+
+1. 在 Chrome / Edge / Safari 中開啟遊戲網址。
+2. 點擊頂部操作列的「安裝 APP」按鈕（或瀏覽器網址列的安裝圖示）。
+3. 即可將 Liquid Cipher 安裝為原生獨立視窗應用程式，享有完整離線遊玩與沉浸式全螢幕操作體驗。
+
+### 方法三：直接瀏覽器開啟
 
 直接使用支援原生 ES Modules 與 Web Worker 的現代瀏覽器開啟專案目錄下的 `index.html` 檔案。
 
@@ -77,8 +84,9 @@ bunx serve .
 - **智能提示動態導引光弧**：觸發提示時，來源管與目標管之間繪製帶有流動粒子與方向箭頭的拋物線導引光弧。
 - **衝擊水花與全息星芒粒子**：傾倒射流具備光暈與液面落點水花微粒子，通關時爆發全息星芒與彩色紙屑。
 
-### 3. 程序化即時音效與無障礙
-- **Web Audio API 合成**：點擊聲、玻璃共振選取音、氣泡注水流動音、提示音與通關和弦琶音均由程式碼即時計算振盪器頻率合成，無任何外部音檔載入負擔。
+### 3. PWA 漸進式離線體驗與無障礙
+- **Service Worker 離線快取**：採用 Cache-First 搭配 Stale-While-Revalidate，離線秒開，連線自動檢查更新並提供浮動更新通知列。
+- **Web Audio API 合成**：所有音效均由程式碼即時計算振盪器頻率合成，無任何外部音檔載入負擔。
 - **無障礙支援**：色彩對比度符合 WCAG 2.1 標準；提供色盲符號晶片標籤（R1, B2, Y3...）；行動端支援微觸覺震動反饋（`navigator.vibrate`）。
 
 ---
@@ -127,14 +135,17 @@ bunx serve .
 
 ```text
 Liquid-Cipher/
-├── index.html                  # 現代語義化 HTML5 骨架與全息彈窗結構
+├── index.html                  # 現代語義化 HTML5 骨架、PWA 宣告與全息彈窗結構
+├── manifest.webmanifest        # PWA Web App Manifest 配置
+├── sw.js                       # PWA Service Worker 離線快取與版本更新腳本
 ├── README.md                   # 專案架構、設計系統與運行說明文檔
 ├── LICENSE                     # MIT 開源授權條款
+├── logo/                       # PWA 應用圖標、Favicon 與 Apple Touch Icon 資產
 ├── src/
-│   ├── main.js                 # 應用程式啟動進入點與生命週期協調
+│   ├── main.js                 # 應用程式啟動進入點、PWA 生命週期與協調
 │   ├── styles/
 │   │   ├── main.css            # Cyber-Lab Dark Tech 設計系統變數、字型與全域排版
-│   │   └── components.css      # HUD 遙測欄、控制按鈕群、隔離艙畫布容器與彈窗樣式
+│   │   └── components.css      # HUD 遙測欄、按鈕群、PWA 更新橫幅與彈窗樣式
 │   ├── core/
 │   │   ├── constants.js        # 12 種化學試劑、管型、渲染參數與運算政策常數
 │   │   ├── types.js            # JSDoc 型別定義
@@ -160,7 +171,9 @@ Liquid-Cipher/
 └── test/
     ├── verify_prng.js          # PRNG 確定性與雜湊演算法測試
     ├── verify_difficulty.js    # 難度曲線非遞減特性測試 (L = 1 ~ 100)
-    └── verify_pipeline.js      # 求解器與三重門禁生成管線測試
+    ├── verify_pipeline.js      # 求解器與三重門禁生成管線測試
+    ├── verify_bugfixes.js      # Bug 修復回歸測試
+    └── verify_pwa.js           # PWA 設定與 Service Worker 離線快取測試
 ```
 
 ---
@@ -170,14 +183,12 @@ Liquid-Cipher/
 專案內建完整的自動化測試套件，可透過 Bun 執行驗證：
 
 ```bash
-# 執行 PRNG 確定性與雜湊演算法測試
+# 執行全量測試套件
 bun test/verify_prng.js
-
-# 執行難度曲線非遞減特性測試 (L = 1 ~ 100)
 bun test/verify_difficulty.js
-
-# 執行求解器與三重門禁生成管線測試
 bun test/verify_pipeline.js
+bun test/verify_bugfixes.js
+bun test/verify_pwa.js
 ```
 
 ---

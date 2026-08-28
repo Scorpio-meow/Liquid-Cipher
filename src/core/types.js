@@ -49,8 +49,10 @@
  * @property {number} level - 關卡序號
  * @property {number} attempt - 生成嘗試次數
  * @property {number} derivedSeed - 32-bit 派生種子數值
- * @property {string[][]} initialBoard - 初始盤面 (每個試管包含由底至頂的試劑 ID 陣列)
  * @property {number} capacity - 單管容量上限
+ * @property {number} [colorCount] - 色彩數量
+ * @property {number} [tubeCount] - 總試管數量
+ * @property {string[][]} initialBoard - 初始盤面 (每個試管包含由底至頂的試劑 ID 陣列)
  * @property {string[]} tubeShapes - 每個試管對應的幾何外型
  * @property {number} knownOptimalSteps - 已證明之最短解法步數
  * @property {SolverProof} solverProof - 求解器證明中繼資料

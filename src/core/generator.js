@@ -125,6 +125,8 @@ export function generateLevel(level, customPolicy = {}) {
             attempt,
             derivedSeed,
             capacity: params.capacity,
+            colorCount: params.colorCount,
+            tubeCount: params.tubeCount,
             initialBoard: candidateBoard,
             tubeShapes,
             knownOptimalSteps: solveRes.steps,

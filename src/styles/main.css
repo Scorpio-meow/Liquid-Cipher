@@ -69,6 +69,13 @@
     padding: 0;
 }
 
+svg {
+    display: inline-block;
+    vertical-align: middle;
+    stroke: currentColor;
+    fill: none;
+}
+
 html, body {
     height: 100%;
 }

@@ -32,6 +32,7 @@ export class GameState {
      * @returns {boolean} 是否成功載入既有存檔
      */
     loadSaveData() {
+        if (typeof localStorage === 'undefined') return false;
         try {
             const raw = localStorage.getItem(APP_CONFIG.storageKey);
             if (!raw) return false;
@@ -45,6 +46,10 @@ export class GameState {
             this.colorBlindMode = !!data.colorBlindMode;
             this.soundEnabled = data.soundEnabled !== undefined ? data.soundEnabled : true;
             this.elapsedMs = data.elapsedMs || 0;
+            this.currentBoard = data.currentBoard && Array.isArray(data.currentBoard) ? cloneBoard(data.currentBoard) : [];
+            this.moveHistory = data.moveHistory && Array.isArray(data.moveHistory) ? data.moveHistory.map(b => cloneBoard(b)) : [];
+            this.redoHistory = data.redoHistory && Array.isArray(data.redoHistory) ? data.redoHistory.map(b => cloneBoard(b)) : [];
+            this.moveCount = this.moveHistory.length;
 
             return true;
         } catch (e) {
@@ -57,7 +62,7 @@ export class GameState {
      * 將當前遊戲狀態寫入 localStorage
      */
     persistSaveData() {
-        if (!this.currentLevelDef) return;
+        if (typeof localStorage === 'undefined' || !this.currentLevelDef) return;
         try {
             const data = {
                 schemaVersion: APP_CONFIG.schemaVersion,
@@ -87,6 +92,7 @@ export class GameState {
      * @returns {import('./types.js').LevelDefinition|null}
      */
     getLevelCache(level) {
+        if (typeof localStorage === 'undefined') return null;
         try {
             const raw = localStorage.getItem(`${APP_CONFIG.cachePrefix}${level}`);
             if (!raw) return null;
@@ -105,6 +111,7 @@ export class GameState {
      * @param {import('./types.js').LevelDefinition} levelDef
      */
     setLevelCache(levelDef) {
+        if (typeof localStorage === 'undefined') return;
         try {
             localStorage.setItem(
                 `${APP_CONFIG.cachePrefix}${levelDef.level}`,
@@ -124,11 +131,13 @@ export class GameState {
         this.currentLevelDef = levelDef;
         this.activeLevel = levelDef.level;
         this.highestUnlockedLevel = Math.max(this.highestUnlockedLevel, levelDef.level);
-        this.currentBoard = resumeBoard ? cloneBoard(resumeBoard) : cloneBoard(levelDef.initialBoard);
-        this.moveHistory = [];
-        this.redoHistory = [];
-        this.moveCount = 0;
-        if (!resumeBoard) {
+        if (resumeBoard && Array.isArray(resumeBoard) && resumeBoard.length === levelDef.initialBoard.length) {
+            this.currentBoard = cloneBoard(resumeBoard);
+        } else {
+            this.currentBoard = cloneBoard(levelDef.initialBoard);
+            this.moveHistory = [];
+            this.redoHistory = [];
+            this.moveCount = 0;
             this.elapsedMs = 0;
         }
         this.setLevelCache(levelDef);
@@ -244,7 +253,7 @@ export class GameState {
      */
     resetCurrentLevel() {
         if (!this.currentLevelDef) return;
-        this.moveHistory.push(cloneBoard(this.currentBoard));
+        this.moveHistory = [];
         this.redoHistory = [];
         this.currentBoard = cloneBoard(this.currentLevelDef.initialBoard);
         this.moveCount = 0;

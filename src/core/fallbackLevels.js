@@ -23,6 +23,8 @@ export const MILESTONE_FALLBACK_LEVELS = {
         attempt: 1,
         derivedSeed: 100000001,
         capacity: 3,
+        colorCount: 3,
+        tubeCount: 5,
         initialBoard: [
             ['cobalt', 'crimson', 'crimson'],
             ['solar', 'cobalt', 'solar'],
@@ -46,6 +48,8 @@ export const MILESTONE_FALLBACK_LEVELS = {
         attempt: 1,
         derivedSeed: 100000002,
         capacity: 3,
+        colorCount: 4,
+        tubeCount: 6,
         initialBoard: [
             ['solar', 'crimson', 'cobalt'],
             ['crimson', 'emerald', 'crimson'],
@@ -70,6 +74,8 @@ export const MILESTONE_FALLBACK_LEVELS = {
         attempt: 1,
         derivedSeed: 100000005,
         capacity: 4,
+        colorCount: 5,
+        tubeCount: 7,
         initialBoard: [
             ['crimson', 'cobalt', 'solar', 'emerald'],
             ['amethyst', 'crimson', 'cobalt', 'solar'],
@@ -95,6 +101,8 @@ export const MILESTONE_FALLBACK_LEVELS = {
         attempt: 1,
         derivedSeed: 100000010,
         capacity: 4,
+        colorCount: 7,
+        tubeCount: 9,
         initialBoard: [
             ['crimson', 'cobalt', 'solar', 'emerald'],
             ['amethyst', 'amber', 'cyan', 'crimson'],
@@ -206,6 +214,8 @@ export function deriveInfiniteFallbackLevel(level) {
             attempt: 0,
             derivedSeed: seed,
             capacity: params.capacity,
+            colorCount: params.colorCount,
+            tubeCount: params.tubeCount,
             initialBoard: safeBoard,
             tubeShapes,
             knownOptimalSteps: optimalSteps,
@@ -220,6 +230,8 @@ export function deriveInfiniteFallbackLevel(level) {
         attempt: 0,
         derivedSeed: seed,
         capacity: params.capacity,
+        colorCount: params.colorCount,
+        tubeCount: params.tubeCount,
         initialBoard,
         tubeShapes,
         knownOptimalSteps: optimalSteps,

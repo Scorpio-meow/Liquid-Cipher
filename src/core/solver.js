@@ -85,7 +85,6 @@ export function isTubeComplete(tube, capacity) {
 export function getValidMoves(board, capacity) {
     const moves = [];
     const numTubes = board.length;
-    let seenEmptyTarget = false;
 
     for (let from = 0; from < numTubes; from++) {
         const srcTube = board[from];
@@ -98,6 +97,7 @@ export function getValidMoves(board, capacity) {
 
         // 若來源管內所有顏色都相同（且不是滿管），且要倒到空管，是無效的對稱移動
         const isSrcMonochromatic = srcBlockCount === srcTube.length;
+        let seenEmptyTarget = false;
 
         for (let to = 0; to < numTubes; to++) {
             if (from === to) continue;
@@ -176,7 +176,7 @@ export function solveExact(initialBoard, capacity, policy) {
     const visited = new Set([startKey]);
 
     // 隊列項目: { board, path, depth }
-    const queue = [{
+    let queue = [{
         board: initialBoard,
         path: [],
         depth: 0
@@ -188,6 +188,12 @@ export function solveExact(initialBoard, capacity, policy) {
     while (head < queue.length) {
         const current = queue[head++];
         exploredNodes++;
+
+        // 定期截斷已訪問的隊列前端以釋放記憶體
+        if (head > 8000) {
+            queue = queue.slice(head);
+            head = 0;
+        }
 
         if (exploredNodes > policy.maxNodesPerAttempt) {
             return {

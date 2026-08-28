@@ -170,15 +170,30 @@
     width: 1.05rem;
     height: 1.05rem;
     flex-shrink: 0;
+    stroke: currentColor;
+    fill: none;
 }
 
 .btn-accent-hint {
     border-color: rgba(245, 158, 11, 0.4);
+    color: var(--neon-amber);
 }
 
 .btn-accent-hint:hover:not(:disabled) {
     border-color: var(--neon-amber);
     box-shadow: var(--shadow-neon-amber);
+    color: #ffffff;
+}
+
+.btn-accent-install {
+    border-color: rgba(16, 185, 129, 0.4);
+    color: var(--neon-emerald);
+}
+
+.btn-accent-install:hover:not(:disabled) {
+    border-color: var(--neon-emerald);
+    box-shadow: var(--shadow-neon-emerald);
+    color: #ffffff;
 }
 
 .key-badge {
@@ -879,7 +894,88 @@
 }
 
 /* --------------------------------------------------------------------------
-   8. 頁尾 (Site Footer)
+   8. PWA 浮動更新橫幅 (PWA Update Toast)
+   -------------------------------------------------------------------------- */
+.pwa-update-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    z-index: 60;
+    background: rgba(11, 20, 42, 0.95);
+    border: 1px solid var(--neon-cyan);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), var(--shadow-neon-cyan);
+    border-radius: var(--radius-pill);
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    animation: toastSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 90vw;
+}
+
+@keyframes toastSlideUp {
+    from { transform: translateX(-50%) translateY(30px); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.toast-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan);
+    animation: statusPulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.toast-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.toast-title {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    letter-spacing: 0.06em;
+}
+
+.toast-desc {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
+.btn-toast-reload {
+    background: linear-gradient(135deg, #0284c7, #06b6d4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 0 12px rgba(14, 165, 233, 0.4);
+}
+
+.btn-toast-reload:hover {
+    background: linear-gradient(135deg, #0369a1, #0891b2);
+    box-shadow: 0 0 18px rgba(14, 165, 233, 0.6);
+    transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   9. 頁尾 (Site Footer)
    -------------------------------------------------------------------------- */
 .site-footer {
     border-top: 1px solid rgba(51, 65, 85, 0.3);
@@ -903,7 +999,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   9. 響應式排版 (Responsive Adaptations)
+   10. 響應式排版 (Responsive Adaptations)
    -------------------------------------------------------------------------- */
 @media (max-width: 860px) {
     .site-header {
@@ -951,5 +1047,18 @@
 
     .modal-stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .pwa-update-toast {
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: var(--radius-md);
+        gap: 0.75rem;
+        width: calc(100% - 2rem);
+    }
+
+    .btn-toast-reload {
+        width: 100%;
+        text-align: center;
     }
 }

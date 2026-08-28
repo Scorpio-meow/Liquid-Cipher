@@ -490,8 +490,9 @@ export class UIController {
         }
 
         if (this.elements.specBadge && this.gameState.currentLevelDef) {
-            const colors = this.gameState.currentLevelDef.colorCount;
-            const tubes = this.gameState.currentBoard.length;
+            const def = this.gameState.currentLevelDef;
+            const colors = def.colorCount || new Set(def.initialBoard.flat().filter(Boolean)).size;
+            const tubes = this.gameState.currentBoard.length || def.initialBoard.length;
             this.elements.specBadge.textContent = `${colors} 色 · ${tubes} 管`;
         }
 
