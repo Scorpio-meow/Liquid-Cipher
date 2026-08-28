@@ -1,127 +1,187 @@
-# 液體解鎖 (Liquid Cipher)
+# 液體解鎖 (Liquid Cipher) - 實驗室色彩解密矩陣
 
-![Language](https://img.shields.io/badge/Language-HTML5%20%2F%20CSS3%20%2F%20JavaScript-blue)
-![Graphics](https://img.shields.io/badge/Graphics-HTML5%20Canvas-red)
-![Audio](https://img.shields.io/badge/Audio-Web%20Audio%20API-orange)
-![License](https://img.shields.io/badge/License-MIT-green)
+[![Language](https://img.shields.io/badge/Language-HTML5%20%2F%20CSS3%20%2F%20JavaScript-blue)](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript)
+[![Architecture](https://img.shields.io/badge/Architecture-Native%20ES%20Modules-purple)](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Guide/Modules)
+[![Graphics](https://img.shields.io/badge/Graphics-High--DPI%20Canvas%202D-red)](https://developer.mozilla.org/zh-TW/docs/Web/API/Canvas_API)
+[![Worker](https://img.shields.io/badge/Computation-Dedicated%20Web%20Worker-teal)](https://developer.mozilla.org/zh-TW/docs/Web/API/Web_Workers_API)
+[![Audio](https://img.shields.io/badge/Audio-Web%20Audio%20API%20Synthesis-orange)](https://developer.mozilla.org/zh-TW/docs/Web/API/Web_Audio_API)
+[![Runtime](https://img.shields.io/badge/Runtime-Bun%20Compatible-black)](https://bun.sh)
+[![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%202.1%20Compliant-success)](https://www.w3.org/WAI/standards-guidelines/wcag/)
+[![License](https://img.shields.io/badge/License-MIT-green)](./LICENSE)
 
-液體解鎖 (Liquid Cipher) 是一款基於 HTML5 Canvas 與 Web Audio API 實現的色彩混合解密網頁遊戲。玩家扮演實驗室研究員，利用減法三原色（RYB）混色邏輯，將各個試管中的化學液體進行分類與重組，使色彩比例重回平衡。本專案完全採用原生網頁技術開發，無外部庫依賴，展現了高效能的 2D 渲染與即時音訊合成技術。
+液體解鎖 (Liquid Cipher) 是一款結合 Cyber-Lab Dark Tech 視覺風格、High-DPI HTML5 Canvas 2D 流體渲染與 Web Audio API 程序化音效合成的單一路徑無限線性 Water Sort 化學試劑解密網頁遊戲。
+
+玩家扮演尖端實驗室研究員，依循色彩分離排序邏輯，將各個試管中的化學試劑進行整理，使每個試管均回歸單一純色或完全清空。本專案完全基於原生現代網頁技術開發，零外部建置或框架依賴，透過獨立 Web Worker 在背景執行狀態空間搜尋（BFS Exact Solver）與關卡生成管線，確保畫面渲染維持極致 60fps 流暢度。
 
 ---
 
 ## 快速開始
 
-本專案為無外部依賴的單頁應用程式（SPA），您可以選擇以下任一方式運行：
+本專案為零建置依賴的單頁應用程式（SPA），支援以下方式啟動與運行：
 
-### 方法一：直接點擊運行
+### 方法一：使用 Bun 靜態伺服器（推薦）
 
-直接使用瀏覽器開啟專案目錄下的 [index.html](./index.html) 檔案即可開始遊戲。
-
-### 方法二：使用 Bun 本地伺服器（推薦）
-
-若您已安裝 Bun，可以在專案根目錄下啟動本地靜態伺服器以獲得更佳的資源加載與安全上下文運行體驗：
+若您已安裝 Bun，可在專案根目錄下啟動本地靜態伺服器：
 
 ```bash
-# 使用 Bun 啟動靜態伺服器
 bunx serve .
 ```
 
 伺服器啟動後，依據終端機輸出的網址（通常為 `http://localhost:3000`）在瀏覽器中開啟即可。
 
----
+### 方法二：直接瀏覽器開啟
 
-## 遊戲特色
-
-- **RYB 減法混色機制**：與常見的單純色彩分類遊戲不同，本遊戲模擬真實的色素混合。當不同顏色的液體接觸時，會依據其體積比例融合為新色彩。
-- **多樣化試管容器**：遊戲內建五種不同幾何形狀的玻璃儀器（圓柱形、錐形、燒瓶形、漏斗形、沙漏形），每種儀器皆透過 Canvas 精細繪製。
-- **Web Audio 網頁音效合成**：專案不依賴任何外部音訊檔案，完全利用 Web Audio API 即時合成點擊、倒水、錯誤與通關等音效。
-- **互動式實驗調色台**：左側面板提供即時混色預覽，玩家可自由調配紅、黃、藍色素，先行測試色彩混合後的視覺呈現。
-- **無限制步驟復原**：內建狀態堆疊系統，隨時可復原上一步操作。
-- **細緻的動態視覺**：包含試管傾斜動畫、拋物線液體流動、液體內部上升氣泡，以及通關時的彩色紙屑特效。
+直接使用支援原生 ES Modules 與 Web Worker 的現代瀏覽器開啟專案目錄下的 `index.html` 檔案。
 
 ---
 
-## 核心機制與演算法
+## 遊戲玩法與互動協議
 
-### 1. 減法混色模型 (RYB to RGB)
+### 1. 試劑傾倒基本法則
 
-遊戲內部使用紅（Red）、黃（Yellow）、藍（Blue）作為色彩通道的基礎。當兩種不同液體混合時，會透過以下公式計算出新的 RYB 比例：
+- **同色相容**：僅能將試劑傾倒至頂層顏色完全相同的目標試管中，或任意完全清空的空管。
+- **連續倒水**：傾倒時系統將自動搬移來源試管頂部所有連續相連的同色液層，直至目標管裝滿或同色液層轉移完畢。
+- **容量限制**：目標試管必須具備足夠剩餘格數，無法超出試管容量上限。
+- **通關條件**：所有試劑皆已依色彩歸類於獨立試管，且盤面上無任何試管存在雜色混合。
 
-```javascript
-function blendRYB(ryb1, vol1, ryb2, vol2) {
-    const tot = vol1 + vol2;
-    if (tot === 0) return [0, 0, 0];
-    return [
-        (ryb1[0] * vol1 + ryb2[0] * vol2) / tot,
-        (ryb1[1] * vol1 + ryb2[1] * vol2) / tot,
-        (ryb1[2] * vol1 + ryb2[2] * vol2) / tot
-    ];
-}
+### 2. 全套鍵盤快捷鍵
+
+| 快捷鍵 | 動作說明 |
+| :--- | :--- |
+| `Z` 或 `Ctrl+Z` | 復原上一步動作 (Undo) |
+| `Y` 或 `Ctrl+Y` | 重做下一步動作 (Redo) |
+| `R` | 重置本關卡至初始狀態 / 勝利後再次挑戰本關 (Restart) |
+| `H` | 智能提示最佳移動路徑 (Hint) |
+| `C` | 切換色盲無障礙符號標籤 (Colorblind Mode) |
+| `M` | 切換程序化音效靜音/開啟 (Mute Sound) |
+| `1` ~ `9` | 依序快速選取對應編號的試管 |
+| `?` 或 `/` | 開啟 / 關閉實驗室操作協議說明彈窗 |
+| `Enter` / `Space` | 通關後一鍵解鎖並進入下一關 |
+| `Escape` | 取消當前試管選取 / 關閉開啟的彈窗 |
+
+---
+
+## UI/UX 設計系統與視覺特色
+
+依據 `ui-ux-pro-max` 設計系統規範，專案採用 Cyber-Lab Dark Tech 設計語彙：
+
+### 1. 即時遙測 Bento HUD 儀表欄
+- **SECTOR 關卡矩陣卡**：即時呈現關卡序號與當前難度規格（如「3 色 · 5 管」）。
+- **效率計量 (Efficiency / Par)**：即時對比「當前步數 / 理論最少步數」，並動態標註 `OPTIMAL`（最佳解）、`PAR`（平標準桿）或超額步數。
+- **無漂移高精度碼表 (CHRONOMETER)**：基於時間戳差值精確計算用時，等寬數位對齊（`tabular-nums`）杜絕抖動，並於通關或加載時自動同步。
+
+### 2. 幾何玻璃儀器與流體物理引擎
+- **實驗室隔離艙標記**：畫布外圍具備科技邊框標記（`┌ ┐ └ ┘`）與頂部狀態條。
+- **置管台與能量光環**：每支試管底部具備金屬置管台刻度環與投影陰影；選取試管時投射脈衝光環與平滑懸浮。
+- **流體分層與表面張力動態**：液體立體漸層增強深度，頂部液面呈現平滑正弦諧波微波瀾（Meniscus）。
+- **智能提示動態導引光弧**：觸發提示時，來源管與目標管之間繪製帶有流動粒子與方向箭頭的拋物線導引光弧。
+- **衝擊水花與全息星芒粒子**：傾倒射流具備光暈與液面落點水花微粒子，通關時爆發全息星芒與彩色紙屑。
+
+### 3. 程序化即時音效與無障礙
+- **Web Audio API 合成**：點擊聲、玻璃共振選取音、氣泡注水流動音、提示音與通關和弦琶音均由程式碼即時計算振盪器頻率合成，無任何外部音檔載入負擔。
+- **無障礙支援**：色彩對比度符合 WCAG 2.1 標準；提供色盲符號晶片標籤（R1, B2, Y3...）；行動端支援微觸覺震動反饋（`navigator.vibrate`）。
+
+---
+
+## 核心演算法與生成管線機制
+
+### 1. 單一路徑無限線性闖關
+
+- **嚴格線性推進**：不提供手動選關、關卡跳轉或難度降級。
+- **無縫自動解鎖**：成功完成當前關卡 $L$ 後，系統自動生成並載入 $L+1$ 關卡。
+- **進度自動保存**：透過 `localStorage` 即時持久化玩家當前關卡、已解鎖最高關卡、當前盤面與已驗證關卡定義快取。
+
+### 2. 連續數學難度曲線 (非遞減特性)
+
+關卡難度隨關卡序號 $L \ge 1$ 依下列連續數學公式平滑非遞減遞進：
+
+- **色彩數量 $C(L)$**：$C(L) = \min(12, \lfloor 3 + 1.8 \times \ln(L) \rfloor)$
+- **試管容量 $V(L)$**：$L \le 2$ 為 $3$ 格；$L \ge 3$ 為標準 $4$ 格。
+- **緩衝空管數 $E(L)$**：固定為 $2$ 支空管。
+- **總試管數 $T(L)$**：$T(L) = C(L) + E(L)$。
+- **逆向置亂深度 $S(L)$**：$S(L) = \min(160, \lfloor 12 + 18 \times \ln(L + 1) + C(L) \times 4 \rfloor)$。
+- **預期最少解法步數區間 $[MinSteps(L), MaxSteps(L)]$**：
+  - $MinSteps(L) = \max(3, \lfloor 1.8 \times C(L) + 1.5 \times \ln(L) \rfloor)$
+  - $MaxSteps(L) = \lfloor 6.0 \times C(L) + 12 \times \ln(L + 1) + 8 \rfloor$
+- **幾何管型解鎖**：隨關卡推進依序解鎖圓柱管（Cylinder）、錐形瓶（Erlenmeyer）、圓底燒瓶（Bulb）、漏斗管（Funnel）與沙漏管（Hourglass）。
+
+### 3. 發布前三重門禁與跨裝置確定性
+
+所有發布給玩家的盤面，均由 32-bit FNV-1a Hash 與 Mulberry32 PRNG 派生確定性種子，並在 Web Worker 中通過發布前三重門禁驗證：
+
+1. **結構合法性檢查**：每種色彩容量完全平衡、空管數正確、盤面非初始已通關狀態。
+2. **Exact Solver 最優性證明**：以廣度優先搜尋（BFS）探索狀態空間，證明存在合法解法且最優性已證明（`optimalityProven: true`）。
+3. **目標解法步數區間驗證**：最短解法步數必須嚴格落在 $[MinSteps(L), MaxSteps(L)]$ 區間內。
+
+任何一道門禁未通過或節點預算超限，生成器將自動遞增 Attempt 並重新生成，絕不發布未完成驗證之盤面。
+
+### 4. 雙層無限 Fallback 備援配方
+
+- **固定里程碑備援**：預置前期教學與重點關卡之完整已驗證盤面與最短解。
+- **動態派生備援配方**：無限高關卡依難度 Tier、固定結構模板與確定性置亂配方動態生成保證可解盤面。
+- **本地驗證快取**：首次動態驗證成功之盤面自動永久寫入快取，後續進入立即讀取。
+
+---
+
+## 模組架構說明
+
+```text
+Liquid-Cipher/
+├── index.html                  # 現代語義化 HTML5 骨架與全息彈窗結構
+├── README.md                   # 專案架構、設計系統與運行說明文檔
+├── LICENSE                     # MIT 開源授權條款
+├── src/
+│   ├── main.js                 # 應用程式啟動進入點與生命週期協調
+│   ├── styles/
+│   │   ├── main.css            # Cyber-Lab Dark Tech 設計系統變數、字型與全域排版
+│   │   └── components.css      # HUD 遙測欄、控制按鈕群、隔離艙畫布容器與彈窗樣式
+│   ├── core/
+│   │   ├── constants.js        # 12 種化學試劑、管型、渲染參數與運算政策常數
+│   │   ├── types.js            # JSDoc 型別定義
+│   │   ├── hash.js             # 32-bit FNV-1a 字串雜湊函式
+│   │   ├── prng.js             # Mulberry32 確定性偽隨機數生成器
+│   │   ├── color.js            # 色彩空間轉換、對比度計算與色盲符號標記
+│   │   ├── difficulty.js       # 純數學難度參數與步數區間計算
+│   │   ├── solver.js           # Exact Solver 最短解證明與 Bounded 提示求解器
+│   │   ├── generator.js        # 三重門禁關卡生成管線
+│   │   ├── fallbackLevels.js   # 雙層無限 Fallback 備援資料庫與配方
+│   │   └── gameState.js        # 遊戲狀態機、Water Sort 傾倒物理與存檔持久化
+│   ├── workers/
+│   │   └── solverWorker.js     # 背景非同步計算 Web Worker
+│   ├── render/
+│   │   ├── shapes.js           # 5 種玻璃容器向量 Path2D 外輪廓定義
+│   │   ├── canvas.js           # High-DPI Retina 適配與自適應試管排版
+│   │   ├── liquidRenderer.js   # 分層液體、半月板微波紋、試管底座與色標渲染
+│   │   └── animationEngine.js  # 60fps 動畫循環、提示能量弧線、射流與粒子特效
+│   ├── audio/
+│   │   └── soundSynth.js       # Web Audio API 即時程序化音效合成器
+│   └── ui/
+│       └── uiController.js     # DOM 事件監聽、HUD 同步、高精度碼表與彈窗控制
+└── test/
+    ├── verify_prng.js          # PRNG 確定性與雜湊演算法測試
+    ├── verify_difficulty.js    # 難度曲線非遞減特性測試 (L = 1 ~ 100)
+    └── verify_pipeline.js      # 求解器與三重門禁生成管線測試
 ```
 
-由於顯示器使用 RGB 加法混色，而本遊戲採用減法混色，因此代碼中實現了 `rybToRgb` 轉換函數。該函數利用三線性插值（Trilinear Interpolation）演算法，將 RYB 三維空間座標映射至 RGB 空間，並針對特定的混色區段進行亮度與飽和度補償（如綠色與紫色的亮度調整），以確保在暗色調的科技感介面中，混色結果依然清晰易辨。
-
-### 2. Canvas 渲染架構
-
-試管與液體皆在 HTML5 Canvas 上繪製，其主要渲染流程如下：
-
-- **試管路徑定義 (`defineTubePath`)**：根據 `shape` 屬性，利用 `arcTo`、`bezierCurveTo` 與 `lineTo` 繪製試管的外輪廓。
-- **液體裁切與漸層 (`ctx.clip`)**：在繪製液體前，先對該試管的路徑進行裁剪，確保填滿的液體不會溢出試管邊界。液體採用線性漸層，模擬玻璃試管兩側的陰影與中央的立體反光。
-- **動態旋轉與位移**：傾倒液體時，利用 `ctx.translate` 與 `ctx.rotate` 對傾倒試管進行動態變換。
-
-### 3. 音效合成原理
-
-音效由 `SoundSynth` 類別控制，透過 Web Audio API 的振盪器（OscillatorNode）與增益節點（GainNode）即時生成，免去了額外下載音訊檔案的延遲與頻寬消耗：
-
-| 音效類型 | 振盪器波形 (Type) | 頻率變化 (Frequency) | 增益控制 (Gain) |
-| :--- | :--- | :--- | :--- |
-| **點擊聲 (Click)** | 正弦波 (sine) | 200 Hz 指數快速上升至 800 Hz | 0.15 指數衰減至 0.01 (歷時 0.15 秒) |
-| **倒水聲 (Pour)** | 多個正弦波 (sine) | 隨機頻率 (250-400 Hz) 上升至 (500-600 Hz) | 每次水滴滴落的增益衰減 (歷時 0.08 秒，重疊 5 次) |
-| **錯誤聲 (Error)** | 鋸齒波 (sawtooth) | 120 Hz 線性下降至 80 Hz | 0.10 線性衰減至 0.001 (歷時 0.20 秒) |
-| **通關聲 (Win)** | 五個正弦波和弦 (sine) | 依序播放 C4, E4, G4, C5, E5 | 各音階線性漸強後指數衰減 (總歷時 1.20 秒) |
-
-### 4. 通關判定條件
-
-每次傾倒動畫結束後，系統會檢查是否滿足通關條件：
-
-1. **單一色彩性**：所有試管內部的液體疊層必須合併為單一層（即不能有異色分層）。
-2. **色彩唯一性**：任何兩個裝有液體的試管，其內含的 RYB 色彩之歐氏距離（Euclidean Distance）必須大於 `0.12`。意即相同色彩的液體必須完全集中到同一個試管中，不能有兩個試管裝有完全相同或高度相近的顏色。
-
 ---
 
-## 關卡與配置說明
+## 驗證測試
 
-遊戲關卡設定於 `LEVELS` 陣列中，您可以透過修改此陣列來自訂關卡。關卡物件結構如下：
+專案內建完整的自動化測試套件，可透過 Bun 執行驗證：
 
-```typescript
-interface Level {
-    title: string;          // 關卡標題，顯示於上方資訊列
-    maxCapacity: number;    // 單個試管的最大液體容量上限
-    tubes: Array<{
-        shape: 'cylinder' | 'erlenmeyer' | 'bulb' | 'funnel' | 'hourglass'; // 試管形狀
-        layers: Array<{
-            ryb: [number, number, number]; // 初始液體的紅黃藍色素比例 (範圍 0 到 1)
-            volume: number;                // 液體體積
-        }>;
-    }>;
-}
+```bash
+# 執行 PRNG 確定性與雜湊演算法測試
+bun test/verify_prng.js
+
+# 執行難度曲線非遞減特性測試 (L = 1 ~ 100)
+bun test/verify_difficulty.js
+
+# 執行求解器與三重門禁生成管線測試
+bun test/verify_pipeline.js
 ```
-
-### 內建關卡配置
-
-- **關卡 1：初等定性實驗**：3 支試管（最大容量 4.0），包含 2 支已裝有紅、黃分層液體的試管，以及 1 支空試管作為緩衝。
-- **關卡 2：三色頻譜平衡**：5 支試管（最大容量 4.0），包含 3 支裝有紅、黃、藍液體之試管與 2 支空試管，引入了更多形狀如漏斗與沙漏。
-- **關卡 3：大煉金術士的密鑰**：6 支試管（最大容量 4.0），包含 3 支高度分層的試管與 3 支空試管，挑戰玩家對混色與空間的調度能力。
-
----
-
-## 專案結構
-
-* [index.html](./index.html)：單頁應用程式主網頁（包含 HTML5 結構、CSS3 樣式與遊戲邏輯 JavaScript）。
-* [README.md](./README.md)：本專案說明文件。
 
 ---
 
 ## 授權條款
 
-本專案採用 [MIT License](./LICENSE) 授權釋出。
+本專案採用 [MIT License](./LICENSE) 授權開源。

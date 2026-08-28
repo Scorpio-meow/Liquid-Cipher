@@ -1,0 +1,955 @@
+/* ==========================================================================
+   Liquid Cipher - UI 元件與控制面板樣式 (components.css)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. 頂部導航與品牌列 (Site Header & Brand Identity)
+   -------------------------------------------------------------------------- */
+.site-header {
+    background: rgba(7, 13, 29, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.85rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.brand-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #0284c7, #6366f1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.brand-icon::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.2) 50%, transparent 60%);
+    animation: lightSweep 4s ease-in-out infinite;
+}
+
+@keyframes lightSweep {
+    0%, 70% { transform: translateX(-100%) translateY(-100%); }
+    100% { transform: translateX(100%) translateY(100%); }
+}
+
+.brand-icon svg {
+    width: 1.6rem;
+    height: 1.6rem;
+    color: #ffffff;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.brand-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.brand-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+    letter-spacing: 0.08em;
+}
+
+.system-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: var(--neon-emerald);
+    font-size: 0.68rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.05em;
+}
+
+.status-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--neon-emerald);
+    box-shadow: 0 0 8px var(--neon-emerald);
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.brand-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   2. 操作控制按鈕群 (Action Control Buttons)
+   -------------------------------------------------------------------------- */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid var(--border-card);
+    color: var(--text-primary);
+    padding: 0.45rem 0.8rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    position: relative;
+}
+
+.btn-action:hover:not(:disabled) {
+    background: rgba(30, 48, 86, 0.85);
+    border-color: var(--border-active);
+    color: #ffffff;
+    box-shadow: var(--shadow-neon-cyan);
+    transform: translateY(-1px);
+}
+
+.btn-action:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.btn-action:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+}
+
+.btn-action.active {
+    background: rgba(14, 165, 233, 0.2);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+.btn-action svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex-shrink: 0;
+}
+
+.btn-accent-hint {
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+.btn-accent-hint:hover:not(:disabled) {
+    border-color: var(--neon-amber);
+    box-shadow: var(--shadow-neon-amber);
+}
+
+.key-badge {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 4px;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.key-badge-light {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 4px;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: #ffffff;
+    line-height: 1;
+}
+
+.btn-icon-only {
+    padding: 0.45rem 0.6rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. 主視圖與 Telemetry HUD Bento 儀表 (Game View & Telemetry HUD)
+   -------------------------------------------------------------------------- */
+.game-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 0;
+    gap: 1.25rem;
+}
+
+.hud-telemetry-container {
+    width: 100%;
+    max-width: 980px;
+    padding: 0.75rem 1rem;
+    display: grid;
+    grid-template-columns: 1.2fr 1.6fr 1.1fr;
+    gap: 0.85rem;
+    align-items: stretch;
+}
+
+.hud-card {
+    background: rgba(7, 13, 29, 0.6);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.95rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.hud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent);
+}
+
+.hud-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+}
+
+.hud-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.hud-label-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--neon-cyan);
+    box-shadow: 0 0 6px var(--neon-cyan);
+}
+
+.hud-caption {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+}
+
+.hud-level-display {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.hud-level-badge {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.hud-meta-badge {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--radius-xs);
+}
+
+.hud-rating-pill {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--radius-xs);
+    letter-spacing: 0.04em;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--neon-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.hud-rating-pill.over {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--neon-amber);
+    border-color: rgba(245, 158, 11, 0.35);
+}
+
+.hud-stat-pair {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.hud-stat-box {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.hud-stat-num {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.hud-stat-sub {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.hud-stat-divider {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+/* CHRONOMETER 計時器卡片專屬樣式 */
+.hud-card-chrono {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.chrono-pulse-icon {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--neon-emerald);
+    box-shadow: 0 0 8px var(--neon-emerald);
+    animation: statusPulse 1.2s ease-in-out infinite;
+}
+
+.hud-timer-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--neon-emerald);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 0.1rem 0.4rem;
+    border-radius: var(--radius-xs);
+    letter-spacing: 0.05em;
+}
+
+.hud-timer-display {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--neon-emerald);
+    text-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+
+/* --------------------------------------------------------------------------
+   4. Canvas 隔離艙容器 (Chamber Housing & Canvas)
+   -------------------------------------------------------------------------- */
+.canvas-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 980px;
+    background: rgba(6, 11, 24, 0.75);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), var(--shadow-glass);
+    padding: 1.5rem 1.25rem 1.25rem;
+    min-height: 440px;
+    overflow: hidden;
+}
+
+/* 科技邊角裝飾 */
+.chamber-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--neon-cyan);
+    border-style: solid;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.chamber-corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+.chamber-corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+.chamber-corner.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+.chamber-corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+.chamber-status-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.5rem 0.65rem;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.08);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+}
+
+.chamber-hint {
+    color: rgba(56, 189, 248, 0.6);
+}
+
+#game-canvas {
+    display: block;
+    max-width: 100%;
+    cursor: pointer;
+    touch-action: none;
+    border-radius: var(--radius-md);
+}
+
+/* --------------------------------------------------------------------------
+   5. 全息加載中遮罩 (Holographic Matrix Loading Screen)
+   -------------------------------------------------------------------------- */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 4, 10, 0.88);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    border-radius: var(--radius-xl);
+    z-index: 30;
+    transition: opacity 0.3s ease;
+    text-align: center;
+    padding: 2rem;
+}
+
+.loading-holo-spinner {
+    position: relative;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.holo-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid transparent;
+}
+
+.holo-ring.outer {
+    width: 100%;
+    height: 100%;
+    border-top-color: var(--neon-cyan);
+    border-bottom-color: var(--neon-cyan);
+    animation: holoSpin 1.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+}
+
+.holo-ring.inner {
+    width: 65%;
+    height: 65%;
+    border-left-color: var(--neon-emerald);
+    border-right-color: var(--neon-emerald);
+    animation: holoSpinReverse 1s linear infinite;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.holo-core {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    box-shadow: 0 0 12px #ffffff, 0 0 20px var(--neon-cyan);
+    animation: corePulse 1s ease-in-out infinite;
+}
+
+@keyframes holoSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes holoSpinReverse {
+    to { transform: rotate(-360deg); }
+}
+
+@keyframes corePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.7; }
+}
+
+.loading-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.35rem;
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+}
+
+.loading-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    max-width: 380px;
+    line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   6. 彈窗系統 (Modal Overlays & Cards)
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 4, 10, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 1.25rem;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-card {
+    background: rgba(11, 20, 42, 0.95);
+    border: 1px solid var(--border-active);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.25);
+    border-radius: var(--radius-xl);
+    padding: 2.25rem;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    transform: scale(0.92) translateY(10px);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-overlay.show .modal-card {
+    transform: scale(1) translateY(0);
+}
+
+/* 通關勝利卡片專用 */
+.win-card {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), var(--shadow-neon-emerald);
+}
+
+.modal-header-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #10b981, #38bdf8, #a855f7);
+}
+
+.modal-icon-container {
+    position: relative;
+    width: 4.5rem;
+    height: 4.5rem;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-icon-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.25);
+    animation: winPulse 2s ease-in-out infinite;
+}
+
+@keyframes winPulse {
+    0% { transform: scale(0.9); opacity: 0.8; }
+    50% { transform: scale(1.3); opacity: 0; }
+    100% { transform: scale(0.9); opacity: 0; }
+}
+
+.modal-icon {
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.35));
+    border: 2px solid var(--neon-emerald);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neon-emerald);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+    z-index: 2;
+}
+
+.modal-icon svg {
+    width: 2.25rem;
+    height: 2.25rem;
+}
+
+.modal-rank-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #10b981, #0d9488);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 900;
+    padding: 0.25rem 0.85rem;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--neon-emerald);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+.modal-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.modal-stats-grid {
+    background: rgba(5, 10, 22, 0.7);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+}
+
+.modal-stat-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.modal-stat-cell.highlight .modal-stat-value {
+    color: var(--neon-cyan);
+}
+
+.modal-stat-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.modal-stat-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.btn-primary-action {
+    background: linear-gradient(135deg, #10b981, #0284c7);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.85rem 1.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-primary-action:hover {
+    background: linear-gradient(135deg, #059669, #0369a1);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-secondary-action {
+    background: rgba(15, 23, 42, 0.8);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-card);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-action:hover {
+    background: rgba(30, 48, 86, 0.9);
+    color: #ffffff;
+    border-color: var(--border-active);
+}
+
+/* --------------------------------------------------------------------------
+   7. 實驗室操作協議彈窗 (Help / Lab Protocol Modal)
+   -------------------------------------------------------------------------- */
+.help-card {
+    max-width: 580px;
+    text-align: left;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-tag {
+    font-size: 0.72rem;
+    color: var(--neon-cyan);
+    letter-spacing: 0.08em;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: var(--radius-xs);
+    transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-close-modal svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.help-modal-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+}
+
+.help-scroll-content {
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.help-section {
+    background: rgba(6, 12, 26, 0.6);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+}
+
+.help-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    margin-bottom: 0.65rem;
+}
+
+.help-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.help-list strong {
+    color: var(--text-primary);
+}
+
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.shortcut-item kbd {
+    min-width: 1.8rem;
+    text-align: center;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--neon-cyan);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+}
+
+.help-text {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   8. 頁尾 (Site Footer)
+   -------------------------------------------------------------------------- */
+.site-footer {
+    border-top: 1px solid rgba(51, 65, 85, 0.3);
+    padding: 0.85rem 1.5rem;
+    text-align: center;
+    background: rgba(4, 8, 18, 0.8);
+}
+
+.footer-content {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.footer-divider {
+    color: rgba(51, 65, 85, 0.6);
+}
+
+/* --------------------------------------------------------------------------
+   9. 響應式排版 (Responsive Adaptations)
+   -------------------------------------------------------------------------- */
+@media (max-width: 860px) {
+    .site-header {
+        padding: 0.75rem 1rem;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .brand-section {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .action-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hud-telemetry-container {
+        grid-template-columns: 1fr;
+    }
+
+    .canvas-wrapper {
+        min-height: 380px;
+        padding: 1rem 0.5rem;
+    }
+
+    .shortcuts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    .btn-action span {
+        display: none;
+    }
+
+    .btn-action {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .modal-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .modal-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
