@@ -999,54 +999,369 @@
 }
 
 /* --------------------------------------------------------------------------
-   10. 響應式排版 (Responsive Adaptations)
+   10. 行動端底部操作塢 (Mobile Bottom Action Dock)
+   -------------------------------------------------------------------------- */
+.mobile-bottom-dock {
+    display: none;
+}
+
+/* --------------------------------------------------------------------------
+   11. 響應式排版與行動端專屬適配 (Responsive Adaptations & Mobile UX)
    -------------------------------------------------------------------------- */
 @media (max-width: 860px) {
-    .site-header {
-        padding: 0.75rem 1rem;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .brand-section {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .action-buttons {
-        width: 100%;
-        justify-content: center;
-    }
-
     .hud-telemetry-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1.3fr 1fr;
     }
 
     .canvas-wrapper {
         min-height: 380px;
         padding: 1rem 0.5rem;
     }
-
-    .shortcuts-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
-@media (max-width: 520px) {
-    .btn-action span {
+@media (max-width: 640px) {
+    /* 頂部導航列行動端簡化：單行緊湊排版 */
+    .site-header {
+        padding: 0.5rem 0.85rem;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .brand-section {
+        width: auto;
+        gap: 0.6rem;
+    }
+
+    .brand-icon {
+        width: 2.2rem;
+        height: 2.2rem;
+        border-radius: var(--radius-sm);
+    }
+
+    .brand-icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    .brand-title {
+        font-size: 1.05rem;
+    }
+
+    .brand-subtitle {
         display: none;
     }
 
-    .btn-action {
-        padding: 0.5rem 0.6rem;
+    .system-status-pill {
+        font-size: 0.62rem;
+        padding: 0.1rem 0.4rem;
+    }
+
+    /* 隱藏頂部的桌面版核心操作按鈕（已遷移至底部操作塢） */
+    .btn-desktop-action {
+        display: none !important;
+    }
+
+    .action-buttons {
+        width: auto;
+        gap: 0.35rem;
+    }
+
+    .btn-utility {
+        padding: 0.45rem 0.55rem;
+        min-height: 38px;
+        min-width: 38px;
+        justify-content: center;
+    }
+
+    .btn-utility .btn-text {
+        display: none;
+    }
+
+    /* 行動裝置隱藏實體鍵盤標籤 */
+    kbd.key-badge,
+    kbd.key-badge-light {
+        display: none !important;
+    }
+
+    /* 精簡型 HUD 遙測膠囊 (單行緊湊排版) */
+    .hud-telemetry-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0.75rem;
+        border-radius: var(--radius-md);
+        gap: 0.4rem;
+        width: 100%;
+        box-shadow: var(--shadow-glass-sm);
+    }
+
+    .hud-card {
+        padding: 0.2rem 0.4rem;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+    }
+
+    .hud-card::before {
+        display: none;
+    }
+
+    .hud-card-header {
+        margin-bottom: 0;
+    }
+
+    .hud-caption,
+    .hud-label-dot {
+        display: none;
+    }
+
+    .hud-level-display {
+        gap: 0.35rem;
+    }
+
+    .hud-level-badge {
+        font-size: 0.92rem;
+    }
+
+    .hud-meta-badge {
+        font-size: 0.65rem;
+        padding: 0.05rem 0.3rem;
+    }
+
+    .hud-stat-pair {
+        gap: 0.35rem;
+    }
+
+    .hud-stat-box {
+        gap: 0.2rem;
+    }
+
+    .hud-stat-num {
+        font-size: 1rem;
+    }
+
+    .hud-stat-sub,
+    .hud-stat-divider {
+        font-size: 0.8rem;
+    }
+
+    .hud-stat-sub {
+        display: none;
+    }
+
+    .hud-rating-pill {
+        font-size: 0.62rem;
+        padding: 0.05rem 0.35rem;
+    }
+
+    .hud-timer-tag {
+        display: none;
+    }
+
+    .hud-timer-display {
+        font-size: 1rem;
+    }
+
+    /* 畫布容器自適應適配 */
+    .app-container {
+        padding: 0 0.5rem;
+    }
+
+    .game-main {
+        padding: 0.4rem 0 calc(5.2rem + env(safe-area-inset-bottom, 0px));
+        gap: 0.5rem;
+        justify-content: flex-start;
+    }
+
+    .canvas-wrapper {
+        padding: 0.75rem 0.35rem 0.5rem;
+        min-height: auto;
+        width: 100%;
+        border-radius: var(--radius-lg);
+    }
+
+    .chamber-status-bar {
+        font-size: 0.62rem;
+        padding: 0 0.25rem 0.35rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .chamber-hint {
+        display: none;
+    }
+
+    .chamber-tag {
+        font-size: 0.6rem;
+        letter-spacing: 0.02em;
+    }
+
+    /* 拇指熱區底部懸浮操作塢 (Bottom Action Dock) */
+    .mobile-bottom-dock {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+        background: rgba(6, 12, 26, 0.92);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-top: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.65), 0 0 15px rgba(56, 189, 248, 0.15);
+        z-index: 45;
+    }
+
+    .btn-dock-action {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.2rem;
+        min-height: 52px;
+        padding: 0.45rem 0.25rem;
+        border-radius: var(--radius-md);
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(71, 85, 105, 0.4);
+        color: var(--text-primary);
+        font-size: 0.72rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.15s ease, border-color 0.15s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-dock-action:active:not(:disabled) {
+        transform: scale(0.93);
+        background: rgba(30, 48, 86, 0.95);
+        border-color: var(--neon-cyan);
+        color: #ffffff;
+        box-shadow: var(--shadow-neon-cyan);
+    }
+
+    .btn-dock-action:disabled {
+        opacity: 0.35;
+        filter: grayscale(0.6);
+        cursor: not-allowed;
+    }
+
+    .btn-dock-action svg {
+        width: 1.35rem;
+        height: 1.35rem;
+        stroke-width: 2.2;
+    }
+
+    .btn-dock-hint {
+        background: rgba(245, 158, 11, 0.14);
+        border-color: rgba(245, 158, 11, 0.5);
+        color: var(--neon-amber);
+        box-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-dock-hint:active:not(:disabled) {
+        background: rgba(245, 158, 11, 0.28);
+        border-color: var(--neon-amber);
+        color: #ffffff;
+        box-shadow: var(--shadow-neon-amber);
+    }
+
+    /* 行動端彈窗底抽屜化 (Bottom Sheets) */
+    .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
     }
 
     .modal-card {
-        padding: 1.5rem 1.25rem;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        max-width: 100%;
+        width: 100%;
+        border-bottom: none;
+        padding: 1.75rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+        transform: translateY(100%);
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8), var(--shadow-neon-cyan);
+    }
+
+    .modal-overlay.show .modal-card {
+        transform: translateY(0);
+    }
+
+    .win-card {
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8), var(--shadow-neon-emerald);
+    }
+
+    .modal-icon-container {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .modal-icon {
+        width: 3.2rem;
+        height: 3.2rem;
+    }
+
+    .modal-icon svg {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    .modal-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .modal-desc {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
     }
 
     .modal-stats-grid {
+        padding: 0.75rem 0.5rem;
+        margin-bottom: 1.25rem;
+        gap: 0.5rem;
+    }
+
+    .modal-stat-label {
+        font-size: 0.65rem;
+    }
+
+    .modal-stat-value {
+        font-size: 1.15rem;
+    }
+
+    .btn-primary-action {
+        min-height: 48px;
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .btn-secondary-action {
+        min-height: 44px;
+        padding: 0.7rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .help-card {
+        max-height: 82vh;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .shortcuts-grid {
         grid-template-columns: 1fr;
+        gap: 0.45rem;
     }
 
     .pwa-update-toast {
@@ -1055,10 +1370,59 @@
         border-radius: var(--radius-md);
         gap: 0.75rem;
         width: calc(100% - 2rem);
+        bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
     }
 
     .btn-toast-reload {
         width: 100%;
         text-align: center;
+    }
+
+    .site-footer {
+        display: none;
+    }
+}
+
+/* 行動端橫向模式專屬適配 (Landscape Mode) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .site-header {
+        padding: 0.3rem 0.75rem;
+    }
+
+    .brand-icon {
+        width: 1.8rem;
+        height: 1.8rem;
+    }
+
+    .brand-title {
+        font-size: 0.9rem;
+    }
+
+    .game-main {
+        padding: 0.25rem 0 calc(3.8rem + env(safe-area-inset-bottom, 0px));
+        gap: 0.35rem;
+    }
+
+    .canvas-wrapper {
+        padding: 0.35rem 0.25rem;
+    }
+
+    .hud-telemetry-container {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .mobile-bottom-dock {
+        padding: 0.35rem 0.75rem calc(0.35rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .btn-dock-action {
+        min-height: 40px;
+        flex-direction: row;
+        gap: 0.35rem;
+    }
+
+    .btn-dock-action svg {
+        width: 1.1rem;
+        height: 1.1rem;
     }
 }

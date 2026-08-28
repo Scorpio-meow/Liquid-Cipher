@@ -312,12 +312,17 @@ class App {
     }
 
     /**
-     * 監聽視窗尺寸改變
+     * 監聽視窗尺寸改變與行動裝置螢幕旋轉
      */
     initResizeHandler() {
-        window.addEventListener('resize', () => {
-            this.handleResize();
+        const onResize = () => this.handleResize();
+        window.addEventListener('resize', onResize);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(onResize, 100);
         });
+        if (typeof window !== 'undefined' && window.visualViewport) {
+            window.visualViewport.addEventListener('resize', onResize);
+        }
     }
 }
 

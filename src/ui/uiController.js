@@ -32,6 +32,10 @@ export class UIController {
             btnColorBlind: document.getElementById('btn-colorblind'),
             btnSound: document.getElementById('btn-sound'),
             btnHelp: document.getElementById('btn-help'),
+            btnMobileUndo: document.getElementById('btn-mobile-undo'),
+            btnMobileRedo: document.getElementById('btn-mobile-redo'),
+            btnMobileRestart: document.getElementById('btn-mobile-restart'),
+            btnMobileHint: document.getElementById('btn-mobile-hint'),
             soundIconOn: document.getElementById('sound-icon-on'),
             soundIconOff: document.getElementById('sound-icon-off'),
             loadingOverlay: document.getElementById('loading-overlay'),
@@ -93,7 +97,7 @@ export class UIController {
             if (tube && tube.length > 0) {
                 this.animationEngine.selectedTubeId = hitId;
                 this.soundSynth.playSelect();
-                this.vibrate(12);
+                this.vibrate(15);
             }
         } else {
             const srcId = this.animationEngine.selectedTubeId;
@@ -109,7 +113,7 @@ export class UIController {
                     this.animationEngine.selectedTubeId = null;
                     this.animationEngine.hintMove = null;
                     this.soundSynth.playPour();
-                    this.vibrate([15, 30, 20]);
+                    this.vibrate([20, 35, 20]);
 
                     this.animationEngine.startPourAnimation(srcId, hitId, check.amount, check.colorId, () => {
                         this.gameState.executePour(srcId, hitId);
@@ -119,14 +123,14 @@ export class UIController {
                         if (this.gameState.isWon()) {
                             this.pauseTimer();
                             this.soundSynth.playWin();
-                            this.vibrate([40, 60, 80, 100]);
+                            this.vibrate([50, 70, 50, 70, 100]);
                             this.animationEngine.spawnConfetti();
                             this.showWinModal();
                         }
                     });
                 } else {
                     this.soundSynth.playError();
-                    this.vibrate(40);
+                    this.vibrate(45);
                     this.animationEngine.selectedTubeId = null;
                 }
             }
@@ -170,30 +174,50 @@ export class UIController {
      * 綁定控制按鈕群事件
      */
     bindButtonEvents() {
-        // 復原
+        // 復原 (桌機 & 行動端)
         if (this.elements.btnUndo) {
             this.elements.btnUndo.addEventListener('click', () => {
                 this.triggerUndo();
             });
         }
+        if (this.elements.btnMobileUndo) {
+            this.elements.btnMobileUndo.addEventListener('click', () => {
+                this.triggerUndo();
+            });
+        }
 
-        // 重做
+        // 重做 (桌機 & 行動端)
         if (this.elements.btnRedo) {
             this.elements.btnRedo.addEventListener('click', () => {
                 this.triggerRedo();
             });
         }
+        if (this.elements.btnMobileRedo) {
+            this.elements.btnMobileRedo.addEventListener('click', () => {
+                this.triggerRedo();
+            });
+        }
 
-        // 重置本關
+        // 重置本關 (桌機 & 行動端)
         if (this.elements.btnRestart) {
             this.elements.btnRestart.addEventListener('click', () => {
                 this.triggerRestart();
             });
         }
+        if (this.elements.btnMobileRestart) {
+            this.elements.btnMobileRestart.addEventListener('click', () => {
+                this.triggerRestart();
+            });
+        }
 
-        // 智能提示
+        // 智能提示 (桌機 & 行動端)
         if (this.elements.btnHint) {
             this.elements.btnHint.addEventListener('click', () => {
+                this.triggerHint();
+            });
+        }
+        if (this.elements.btnMobileHint) {
+            this.elements.btnMobileHint.addEventListener('click', () => {
                 this.triggerHint();
             });
         }
@@ -401,7 +425,7 @@ export class UIController {
     triggerHint() {
         if (this.animationEngine.animState.isPouring) return;
         this.soundSynth.playHint();
-        this.vibrate([10, 30]);
+        this.vibrate([15, 30, 20]);
         if (this.appHooks.onRequestHint) {
             this.appHooks.onRequestHint();
         }
@@ -523,11 +547,21 @@ export class UIController {
             }
         }
 
+        const canUndo = this.gameState.moveHistory.length > 0;
+        const canRedo = this.gameState.redoHistory.length > 0;
+
         if (this.elements.btnUndo) {
-            this.elements.btnUndo.disabled = this.gameState.moveHistory.length === 0;
+            this.elements.btnUndo.disabled = !canUndo;
         }
+        if (this.elements.btnMobileUndo) {
+            this.elements.btnMobileUndo.disabled = !canUndo;
+        }
+
         if (this.elements.btnRedo) {
-            this.elements.btnRedo.disabled = this.gameState.redoHistory.length === 0;
+            this.elements.btnRedo.disabled = !canRedo;
+        }
+        if (this.elements.btnMobileRedo) {
+            this.elements.btnMobileRedo.disabled = !canRedo;
         }
 
         if (this.elements.btnColorBlind) {
