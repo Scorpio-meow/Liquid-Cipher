@@ -1,7 +1,8 @@
 /**
  * 求解器與關卡生成管線三重門禁驗證腳本
  */
-import { solveExact, isBoardSolved } from '../src/core/solver.js';
+import { solveExact } from '../src/core/solver.js';
+import { isBoardSolved } from '../src/core/board.js';
 import { generateLevel, validateBoardStructure } from '../src/core/generator.js';
 import { getLevelParams } from '../src/core/difficulty.js';
 import { deriveInfiniteFallbackLevel } from '../src/core/fallbackLevels.js';

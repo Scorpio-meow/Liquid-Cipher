@@ -1,242 +1,119 @@
 /**
  * 液體解鎖 (Liquid Cipher) 狀態空間搜尋求解器
- * 包含完整最優性證明 Exact Solver (BFS) 與輕量即時提示 Bounded Solver。
+ * Exact Solver 以 BFS 證明最短解；路徑以父節點指標回溯，避免每個節點複製整條路徑。
  */
+import {
+    applyMove,
+    getTopColorBlock,
+    isBoardSolved,
+    isTubeComplete,
+    serializeBoard
+} from './board.js';
 /**
- * 檢查盤面是否處於通關目標狀態 (所有試管皆為空或裝滿單一色)
- * @param {string[][]} board - 盤面狀態
- * @param {number} capacity - 單管容量
- * @returns {boolean}
- */
-export function isBoardSolved(board, capacity) {
-    for (let i = 0; i < board.length; i++) {
-        const tube = board[i];
-        if (tube.length === 0) continue;
-        if (tube.length !== capacity) return false;
-        const firstColor = tube[0];
-        for (let j = 1; j < tube.length; j++) {
-            if (tube[j] !== firstColor) return false;
-        }
-    }
-    return true;
-}
-/**
- * 產生盤面的規範化（Canonical）唯一字串鍵值，利用試管排列不變性消除對稱狀態
- * @param {string[][]} board
- * @returns {string}
- */
-export function serializeBoard(board) {
-    const tubeStrings = board.map(tube => tube.join(','));
-    tubeStrings.sort();
-    return tubeStrings.join('|');
-}
-/**
- * 複製盤面資料
- * @param {string[][]} board
- * @returns {string[][]}
- */
-export function cloneBoard(board) {
-    return board.map(tube => [...tube]);
-}
-/**
- * 計算試管頂部連續同色色塊的數量
- * @param {string[]} tube
- * @returns {{ color: string, count: number }}
- */
-export function getTopColorBlock(tube) {
-    if (tube.length === 0) return { color: '', count: 0 };
-    const color = tube[tube.length - 1];
-    let count = 0;
-    for (let i = tube.length - 1; i >= 0; i--) {
-        if (tube[i] === color) {
-            count++;
-        } else {
-            break;
-        }
-    }
-    return { color, count };
-}
-/**
- * 檢查單一試管是否已為完全裝滿的單色試管（完成態）
- * @param {string[]} tube
- * @param {number} capacity
- * @returns {boolean}
- */
-export function isTubeComplete(tube, capacity) {
-    if (tube.length !== capacity) return false;
-    const c = tube[0];
-    for (let i = 1; i < tube.length; i++) {
-        if (tube[i] !== c) return false;
-    }
-    return true;
-}
-/**
- * 計算指定盤面下的所有合法移動動作
+ * 求解用的合法移動（含對稱剪枝）
+ * - 已完成的滿管不再移出
+ * - 純色管倒入空管沒有進展，略過
+ * - 同一來源只探索第一支空管
  * @param {string[][]} board
  * @param {number} capacity
- * @returns {Array<{ from: number, to: number, amount: number, colorId: string }>}
+ * @returns {import('./types.js').MoveAction[]}
  */
 export function getValidMoves(board, capacity) {
     const moves = [];
-    const numTubes = board.length;
-    for (let from = 0; from < numTubes; from++) {
-        const srcTube = board[from];
-        if (srcTube.length === 0) continue;
-        // 若來源試管已是滿管純色，不再移出
-        if (isTubeComplete(srcTube, capacity)) continue;
-        const { color: srcColor, count: srcBlockCount } = getTopColorBlock(srcTube);
-        // 若來源管內所有顏色都相同（且不是滿管），且要倒到空管，是無效的對稱移動
-        const isSrcMonochromatic = srcBlockCount === srcTube.length;
+    for (let from = 0; from < board.length; from++) {
+        const src = board[from];
+        if (src.length === 0 || isTubeComplete(src, capacity)) continue;
+        const { color, count } = getTopColorBlock(src);
+        const isMonochrome = count === src.length;
         let seenEmptyTarget = false;
-        for (let to = 0; to < numTubes; to++) {
+        for (let to = 0; to < board.length; to++) {
             if (from === to) continue;
-            const tgtTube = board[to];
-            if (tgtTube.length === capacity) continue; // 目標管已滿
-            if (tgtTube.length === 0) {
-                // 如果目標管為空管
-                if (isSrcMonochromatic) {
-                    // 純色管倒入空管無實質進展，忽略
-                    continue;
-                }
-                if (seenEmptyTarget) {
-                    // 只向第一個空管倒，避免探索多個空管的對稱分支
-                    continue;
-                }
+            const tgt = board[to];
+            if (tgt.length >= capacity) continue;
+            if (tgt.length === 0) {
+                if (isMonochrome || seenEmptyTarget) continue;
                 seenEmptyTarget = true;
-                const amount = Math.min(srcBlockCount, capacity);
-                moves.push({ from, to, amount, colorId: srcColor });
-            } else {
-                // 目標管非空，檢查頂部顏色是否相同
-                const tgtTopColor = tgtTube[tgtTube.length - 1];
-                if (tgtTopColor === srcColor) {
-                    const availableSpace = capacity - tgtTube.length;
-                    const amount = Math.min(srcBlockCount, availableSpace);
-                    if (amount > 0) {
-                        moves.push({ from, to, amount, colorId: srcColor });
-                    }
-                }
+                moves.push({ from, to, amount: count, colorId: color });
+            } else if (tgt[tgt.length - 1] === color) {
+                moves.push({ from, to, amount: Math.min(count, capacity - tgt.length), colorId: color });
             }
         }
     }
     return moves;
 }
 /**
- * 執行倒水動作並回傳新盤面
- * @param {string[][]} board
- * @param {import('./types.js').MoveAction} move
- * @returns {string[][]}
+ * @param {{ parent: number, move: import('./types.js').MoveAction|null }[]} nodes
+ * @param {number} index
+ * @param {import('./types.js').MoveAction} lastMove
+ * @returns {import('./types.js').MoveAction[]}
  */
-export function applyMove(board, move) {
-    const nextBoard = cloneBoard(board);
-    const { from, to, amount } = move;
-    for (let i = 0; i < amount; i++) {
-        const item = nextBoard[from].pop();
-        nextBoard[to].push(item);
+function tracePath(nodes, index, lastMove) {
+    const path = [lastMove];
+    for (let i = index; nodes[i].parent !== -1; i = nodes[i].parent) {
+        path.push(nodes[i].move);
     }
-    return nextBoard;
+    return path.reverse();
 }
 /**
- * Exact Solver: 採用廣度優先搜尋 (BFS)，具有無權重圖最短路徑數學保證
- * @param {string[][]} initialBoard - 初始盤面
- * @param {number} capacity - 單管容量
- * @param {import('./constants.js').EXACT_SOLVER_POLICY} policy - 運算政策
+ * Exact Solver：BFS 於無權重圖首次抵達即為最短解
+ * @param {string[][]} initialBoard
+ * @param {number} capacity
+ * @param {{ maxNodesPerAttempt: number, maxDepth: number }} policy
  * @returns {import('./types.js').SolverResult}
  */
 export function solveExact(initialBoard, capacity, policy) {
     const startTime = Date.now();
-    if (isBoardSolved(initialBoard, capacity)) {
-        return {
-            status: 'solved',
-            optimalityProven: true,
-            steps: 0,
-            path: [],
-            exploredNodes: 1,
-            elapsedMs: Date.now() - startTime
-        };
-    }
-    const startKey = serializeBoard(initialBoard);
-    const visited = new Set([startKey]);
-    // 隊列項目: { board, path, depth }
-    let queue = [{
-        board: initialBoard,
-        path: [],
-        depth: 0
-    }];
-    let head = 0;
-    let exploredNodes = 0;
-    while (head < queue.length) {
-        const current = queue[head++];
-        exploredNodes++;
-        // 定期截斷已訪問的隊列前端以釋放記憶體
-        if (head > 8000) {
-            queue = queue.slice(head);
-            head = 0;
-        }
-        if (exploredNodes > policy.maxNodesPerAttempt) {
-            return {
-                status: 'node_limit_exceeded',
-                optimalityProven: false,
-                steps: -1,
-                path: [],
-                exploredNodes,
-                elapsedMs: Date.now() - startTime
-            };
-        }
-        if (current.depth >= policy.maxDepth) {
-            continue;
-        }
-        const validMoves = getValidMoves(current.board, capacity);
-        for (const move of validMoves) {
-            const nextBoard = applyMove(current.board, move);
-            if (isBoardSolved(nextBoard, capacity)) {
-                const finalPath = [...current.path, move];
-                return {
-                    status: 'solved',
-                    optimalityProven: true, // BFS 首次抵達必為最短解
-                    steps: finalPath.length,
-                    path: finalPath,
-                    exploredNodes,
-                    elapsedMs: Date.now() - startTime
-                };
-            }
-            const nextKey = serializeBoard(nextBoard);
-            if (!visited.has(nextKey)) {
-                visited.add(nextKey);
-                queue.push({
-                    board: nextBoard,
-                    path: [...current.path, move],
-                    depth: current.depth + 1
-                });
-            }
-        }
-    }
-    return {
-        status: 'unsolvable',
-        optimalityProven: false,
-        steps: -1,
-        path: [],
+    const result = (status, path, exploredNodes) => ({
+        status,
+        optimalityProven: status === 'solved',
+        steps: status === 'solved' ? path.length : -1,
+        path,
         exploredNodes,
         elapsedMs: Date.now() - startTime
-    };
+    });
+    if (isBoardSolved(initialBoard, capacity)) {
+        return result('solved', [], 1);
+    }
+    /** @type {{ board: string[][]|null, parent: number, move: import('./types.js').MoveAction|null, depth: number }[]} */
+    const nodes = [{ board: initialBoard, parent: -1, move: null, depth: 0 }];
+    const visited = new Set([serializeBoard(initialBoard)]);
+    let depthLimited = false;
+    for (let head = 0; head < nodes.length; head++) {
+        if (head >= policy.maxNodesPerAttempt) {
+            return result('node_limit_exceeded', [], head);
+        }
+        const current = nodes[head];
+        const board = current.board;
+        current.board = null; // 已展開節點只保留回溯資訊
+        if (current.depth >= policy.maxDepth) {
+            depthLimited = true;
+            continue;
+        }
+        for (const move of getValidMoves(board, capacity)) {
+            const next = applyMove(board, move);
+            if (isBoardSolved(next, capacity)) {
+                return result('solved', tracePath(nodes, head, move), head + 1);
+            }
+            const key = serializeBoard(next);
+            if (visited.has(key)) continue;
+            visited.add(key);
+            nodes.push({ board: next, parent: head, move, depth: current.depth + 1 });
+        }
+    }
+    return result(depthLimited ? 'depth_exceeded' : 'unsolvable', [], nodes.length);
 }
 /**
- * Bounded Hint Solver: 快速啟發式搜尋，提供遊戲中即時提示
- * @param {string[][]} currentBoard
+ * 遊戲中提示：回傳最短解的第一步與求解狀態
+ * @param {string[][]} board
  * @param {number} capacity
- * @param {{ maxNodes?: number, maxDepth?: number }} [options]
- * @returns {import('./types.js').MoveAction|null}
+ * @param {{ maxNodesPerAttempt: number, maxDepth: number }} policy
+ * @returns {{ status: import('./types.js').SolverResult['status'], move: import('./types.js').MoveAction|null, remainingSteps: number }}
  */
-export function solveBoundedHint(currentBoard, capacity, options = {}) {
-    const maxNodes = options.maxNodes || 15000;
-    const maxDepth = options.maxDepth || 60;
-    const res = solveExact(currentBoard, capacity, {
-        maxNodesPerAttempt: maxNodes,
-        maxDepth,
-        maxAttempts: 1,
-        uiWatchdogMs: 1000
-    });
-    if (res.status === 'solved' && res.path.length > 0) {
-        return res.path[0];
-    }
-    return null;
+export function solveHint(board, capacity, policy) {
+    const res = solveExact(board, capacity, policy);
+    return {
+        status: res.status,
+        move: res.path.length > 0 ? res.path[0] : null,
+        remainingSteps: res.steps
+    };
 }

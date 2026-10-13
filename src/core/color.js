@@ -65,11 +65,10 @@ export function getAccessibleTextColor(id) {
     return ratioWhite >= ratioDark ? '#FFFFFF' : '#0F172A';
 }
 /**
- * 取得該試劑對應之色盲輔助標記字串
+ * 取得該試劑對應之色盲輔助形狀符號
  * @param {string} id - 試劑 ID
- * @returns {string} 符號代碼 (e.g. 'R1')
+ * @returns {string} 形狀代碼 (e.g. 'circle')
  */
-export function getColorBlindSymbol(id) {
-    const r = getReagentById(id);
-    return r.symbol;
+export function getReagentGlyph(id) {
+    return getReagentById(id).glyph;
 }

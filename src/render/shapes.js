@@ -1,69 +1,89 @@
 /**
- * 液體解鎖 (Liquid Cipher) 實驗室幾何玻璃儀器向量路徑定義
+ * 液體解鎖 (Liquid Cipher) 實驗室玻璃器皿外輪廓
+ * 所有尺寸皆與試管寬高成比例，任何縮放下外型一致。
  */
 /**
- * 繪製特定形狀的試管玻璃外輪廓路徑
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} x - 中心 X 座標 (基準點為試管底部中心)
- * @param {number} y - 底部 Y 座標
- * @param {number} w - 試管寬度
- * @param {number} h - 試管高度
- * @param {string} shape - 幾何形狀 ('cylinder'|'erlenmeyer'|'bulb'|'funnel'|'hourglass')
+ * 瓶口寬度（傾倒射流與瓶塞定位用）
+ * @param {number} w
+ * @param {string} shape
+ * @returns {number}
  */
-export function defineTubePath(ctx, x, y, w, h, shape = 'cylinder') {
+export function mouthWidth(w, shape) {
+    if (shape === 'erlenmeyer') return w * 0.56;
+    if (shape === 'bulb') return w * 0.5;
+    return w;
+}
+/**
+ * 建立器皿外輪廓路徑（開口向上，不閉合）
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x - 底部中心 X
+ * @param {number} y - 底部 Y
+ * @param {number} w - 寬度
+ * @param {number} h - 高度
+ * @param {string} shape - 'cylinder'|'erlenmeyer'|'bulb'|'funnel'|'hourglass'
+ */
+export function defineTubePath(ctx, x, y, w, h, shape) {
+    const hw = w / 2;
     ctx.beginPath();
-    if (shape === 'cylinder') {
-        const r = Math.min(18, w / 2);
-        ctx.moveTo(x - w / 2, y - h);
-        ctx.lineTo(x - w / 2, y - r);
-        ctx.arcTo(x - w / 2, y, x, y, r);
-        ctx.arcTo(x + w / 2, y, x + w / 2, y - r, r);
-        ctx.lineTo(x + w / 2, y - h);
-    }
-    else if (shape === 'erlenmeyer') {
-        const neckW = Math.max(14, w * 0.28);
-        const neckH = h * 0.26;
-        ctx.moveTo(x - neckW, y - h);
-        ctx.lineTo(x - neckW, y - h + neckH);
-        ctx.lineTo(x - w / 2, y - 14);
-        ctx.arcTo(x - w / 2, y, x, y, 14);
-        ctx.arcTo(x + w / 2, y, x + w / 2, y - 14, 14);
-        ctx.lineTo(x + neckW, y - h + neckH);
-        ctx.lineTo(x + neckW, y - h);
-    }
-    else if (shape === 'bulb') {
-        const neckW = Math.max(13, w * 0.24);
-        const neckH = h * 0.35;
-        ctx.moveTo(x - neckW, y - h);
-        ctx.lineTo(x - neckW, y - h + neckH);
-        ctx.bezierCurveTo(x - w / 2 - 8, y - h + neckH + 15, x - w / 2 - 4, y, x, y);
-        ctx.bezierCurveTo(x + w / 2 + 4, y, x + w / 2 + 8, y - h + neckH + 15, x + neckW, y - h + neckH);
-        ctx.lineTo(x + neckW, y - h);
-    }
-    else if (shape === 'funnel') {
-        const stemW = Math.max(12, w * 0.22);
-        const coneH = h * 0.45;
-        ctx.moveTo(x - w / 2, y - h);
-        ctx.lineTo(x - stemW, y - h + coneH);
-        ctx.lineTo(x - stemW, y - 10);
-        ctx.arcTo(x - stemW, y, x, y, 10);
-        ctx.arcTo(x + stemW, y, x + stemW, y - 10, 10);
-        ctx.lineTo(x + stemW, y - h + coneH);
-        ctx.lineTo(x + w / 2, y - h);
-    }
-    else if (shape === 'hourglass') {
-        const waistW = Math.max(11, w * 0.2);
-        const waistY = y - h * 0.5;
-        ctx.moveTo(x - w / 2, y - h);
-        ctx.lineTo(x - waistW, waistY);
-        ctx.lineTo(x - w / 2 + 4, y - 15);
-        ctx.arcTo(x - w / 2 + 4, y, x, y, 15);
-        ctx.arcTo(x + w / 2 - 4, y, x + w / 2 - 4, y - 15, 15);
-        ctx.lineTo(x + waistW, waistY);
-        ctx.lineTo(x + w / 2, y - h);
-    }
-    else {
-        // 預設圓柱
-        defineTubePath(ctx, x, y, w, h, 'cylinder');
+    switch (shape) {
+        case 'cylinder': {
+            const r = hw * 0.9;
+            ctx.moveTo(x - hw, y - h);
+            ctx.lineTo(x - hw, y - r);
+            ctx.arcTo(x - hw, y, x, y, r);
+            ctx.arcTo(x + hw, y, x + hw, y - r, r);
+            ctx.lineTo(x + hw, y - h);
+            return;
+        }
+        case 'erlenmeyer': {
+            const neck = mouthWidth(w, shape) / 2;
+            const neckH = h * 0.26;
+            const r = w * 0.2;
+            ctx.moveTo(x - neck, y - h);
+            ctx.lineTo(x - neck, y - h + neckH);
+            ctx.lineTo(x - hw, y - r);
+            ctx.arcTo(x - hw, y, x, y, r);
+            ctx.arcTo(x + hw, y, x + hw, y - r, r);
+            ctx.lineTo(x + neck, y - h + neckH);
+            ctx.lineTo(x + neck, y - h);
+            return;
+        }
+        case 'bulb': {
+            const neck = mouthWidth(w, shape) / 2;
+            const neckH = h * 0.35;
+            ctx.moveTo(x - neck, y - h);
+            ctx.lineTo(x - neck, y - h + neckH);
+            ctx.bezierCurveTo(x - hw * 1.25, y - h + neckH + h * 0.08, x - hw * 1.12, y, x, y);
+            ctx.bezierCurveTo(x + hw * 1.12, y, x + hw * 1.25, y - h + neckH + h * 0.08, x + neck, y - h + neckH);
+            ctx.lineTo(x + neck, y - h);
+            return;
+        }
+        case 'funnel': {
+            const stem = w * 0.24;
+            const coneH = h * 0.42;
+            ctx.moveTo(x - hw, y - h);
+            ctx.lineTo(x - stem, y - h + coneH);
+            ctx.lineTo(x - stem, y - stem);
+            ctx.arcTo(x - stem, y, x, y, stem);
+            ctx.arcTo(x + stem, y, x + stem, y - stem, stem);
+            ctx.lineTo(x + stem, y - h + coneH);
+            ctx.lineTo(x + hw, y - h);
+            return;
+        }
+        case 'hourglass': {
+            const waist = w * 0.22;
+            const waistY = y - h * 0.5;
+            const r = w * 0.3;
+            ctx.moveTo(x - hw, y - h);
+            ctx.lineTo(x - waist, waistY);
+            ctx.lineTo(x - hw * 0.9, y - r);
+            ctx.arcTo(x - hw * 0.9, y, x, y, r);
+            ctx.arcTo(x + hw * 0.9, y, x + hw * 0.9, y - r, r);
+            ctx.lineTo(x + waist, waistY);
+            ctx.lineTo(x + hw, y - h);
+            return;
+        }
+        default:
+            throw new Error(`未知的試管造型: ${shape}`);
     }
 }

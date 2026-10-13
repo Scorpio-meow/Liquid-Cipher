@@ -1,7 +1,7 @@
 /**
  * PWA 設定與 Service Worker 靜態快取驗證測試
  */
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 import { resolve, join } from 'path';
 console.log('--- 正在執行 PWA 設定與離線快取驗證測試 ---');
 const projectRoot = resolve('.');
@@ -58,7 +58,16 @@ const projectRoot = resolve('.');
             throw new Error(`sw.js 預快取清單中的檔案不存在: ${relPath}`);
         }
     }
-    console.log(`✓ Service Worker 預快取清單中全部 ${assetPaths.length} 個核心資源均確認存在`);
+    // 反向檢查：src/ 下每個模組都必須在預快取清單中，否則離線時會載入失敗
+    const srcFiles = readdirSync(join(projectRoot, 'src'), { recursive: true })
+        .map(f => `./src/${String(f).split('\\').join('/')}`)
+        .filter(f => f.endsWith('.js') || f.endsWith('.css'));
+    for (const f of srcFiles) {
+        if (!assetPaths.includes(f)) {
+            throw new Error(`sw.js 預快取清單缺少模組: ${f}`);
+        }
+    }
+    console.log(`✓ Service Worker 預快取清單中全部 ${assetPaths.length} 個核心資源均確認存在，且涵蓋 src/ 全部 ${srcFiles.length} 個模組`);
 }
 // 測試 3: 驗證 index.html 中的 PWA 元素宣告
 {
@@ -67,11 +76,11 @@ const projectRoot = resolve('.');
     if (!html.includes('manifest.webmanifest')) {
         throw new Error('index.html 缺少 manifest.webmanifest 連結！');
     }
-    if (!html.includes('btn-install-pwa')) {
-        throw new Error('index.html 缺少 btn-install-pwa 按鈕元件！');
+    if (!html.includes('id="btn-install"')) {
+        throw new Error('index.html 缺少 btn-install 安裝按鈕！');
     }
-    if (!html.includes('pwa-update-toast')) {
-        throw new Error('index.html 缺少 pwa-update-toast 更新提示元件！');
+    if (!html.includes('id="update-banner"')) {
+        throw new Error('index.html 缺少 update-banner 更新提示元件！');
     }
     console.log('✓ index.html 的 PWA 元件與 Manifest 宣告檢驗通過');
 }

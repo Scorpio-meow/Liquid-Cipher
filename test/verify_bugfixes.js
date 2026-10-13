@@ -1,31 +1,27 @@
 /**
  * Bug 修復回歸驗證測試套件
  */
-import { GameState } from '../src/core/gameState.js';
+import { GameSession } from '../src/core/session.js';
 import { generateLevel } from '../src/core/generator.js';
 import { deriveInfiniteFallbackLevel, MILESTONE_FALLBACK_LEVELS } from '../src/core/fallbackLevels.js';
 import { getValidMoves, solveExact } from '../src/core/solver.js';
 import { EXACT_SOLVER_POLICY } from '../src/core/constants.js';
 console.log('--- 正在執行 Bug 修復回歸驗證測試 ---');
-// 測試 1: resetCurrentLevel() 不應記入 moveHistory
+// 測試 1: restart() 必須清空復原與重做歷史
 {
-    const gs = new GameState();
+    const session = new GameSession(() => 0);
     const levelDef = generateLevel(1);
-    gs.applyLevelDefinition(levelDef);
-    // 執行一次合法移動
-    const moves = getValidMoves(gs.currentBoard, levelDef.capacity);
-    if (moves.length > 0) {
-        gs.executePour(moves[0].from, moves[0].to);
+    session.load(levelDef, null);
+    const moves = getValidMoves(session.board, levelDef.capacity);
+    session.pour(moves[0].from, moves[0].to);
+    if (session.history.length !== 1) {
+        throw new Error('執行倒水後 history 長度應為 1');
     }
-    if (gs.moveHistory.length !== 1) {
-        throw new Error('執行倒水後 moveHistory 長度應為 1');
+    session.restart();
+    if (session.history.length !== 0 || session.redoStack.length !== 0) {
+        throw new Error('重置關卡後 history 與 redoStack 必須為空陣列！');
     }
-    // 重置關卡
-    gs.resetCurrentLevel();
-    if (gs.moveHistory.length !== 0 || gs.redoHistory.length !== 0) {
-        throw new Error('重置關卡後 moveHistory 與 redoHistory 必須為空陣列！');
-    }
-    console.log('✓ Bug 1 (resetCurrentLevel 清空歷史記錄) 驗證通過');
+    console.log('✓ Bug 1 (restart 清空歷史記錄) 驗證通過');
 }
 // 測試 2: LevelDefinition 包含 colorCount 與 tubeCount
 {
@@ -71,5 +67,15 @@ console.log('--- 正在執行 Bug 修復回歸驗證測試 ---');
         throw new Error('solveExact 求解失敗');
     }
     console.log('✓ Bug 4 (BFS queue 記憶體管理與求解有效性) 驗證通過');
+}
+// 測試 5: 里程碑備援關卡宣稱的最少步數必須與 Exact Solver 結果一致
+{
+    for (const [lvl, def] of Object.entries(MILESTONE_FALLBACK_LEVELS)) {
+        const res = solveExact(def.initialBoard, def.capacity, EXACT_SOLVER_POLICY);
+        if (res.steps !== def.knownOptimalSteps) {
+            throw new Error(`里程碑第 ${lvl} 關宣稱 ${def.knownOptimalSteps} 步，實際最少 ${res.steps} 步！`);
+        }
+    }
+    console.log('✓ Bug 5 (里程碑備援關卡最少步數正確) 驗證通過');
 }
 console.log('所有 Bug 修復回歸驗證測試全部通過！');

@@ -1,13 +1,12 @@
 /**
  * 液體解鎖 (Liquid Cipher) 雙層無限 Fallback 備援資料庫與派生配方
- * 保證即使在極端超時或生成重試耗盡時，依然提供 100% 通過三重門禁之已驗證盤面。
+ * 生成重試耗盡時提供可解盤面；最少步數僅在 Exact Solver 證明成功時填入，否則為 null。
  */
-import { REAGENTS } from './constants.js';
-import { getLevelParams } from './difficulty.js';
+import { APP_CONFIG, EXACT_SOLVER_POLICY, REAGENTS } from './constants.js';
+import { getLevelParams, assignTubeShapes } from './difficulty.js';
 import { createPRNG } from './prng.js';
 import { deriveLevelSeed } from './hash.js';
 import { solveExact } from './solver.js';
-import { EXACT_SOLVER_POLICY } from './constants.js';
 /**
  * 第一層：固定里程碑預驗證關卡清單
  * 每個關卡均包含完整盤面定義與已知最短步數證明
@@ -15,7 +14,7 @@ import { EXACT_SOLVER_POLICY } from './constants.js';
  */
 export const MILESTONE_FALLBACK_LEVELS = {
     1: {
-        schemaVersion: 1,
+        schemaVersion: APP_CONFIG.schemaVersion,
         generatorVersion: 1,
         level: 1,
         attempt: 1,
@@ -35,12 +34,12 @@ export const MILESTONE_FALLBACK_LEVELS = {
         solverProof: {
             algorithm: 'bfs',
             optimalityProven: true,
-            exploredNodes: 42,
+            exploredNodes: 50,
             maxNodesPolicy: 2000000
         }
     },
     2: {
-        schemaVersion: 1,
+        schemaVersion: APP_CONFIG.schemaVersion,
         generatorVersion: 1,
         level: 2,
         attempt: 1,
@@ -57,16 +56,16 @@ export const MILESTONE_FALLBACK_LEVELS = {
             []
         ],
         tubeShapes: ['cylinder', 'cylinder', 'cylinder', 'cylinder', 'cylinder', 'cylinder'],
-        knownOptimalSteps: 8,
+        knownOptimalSteps: 7,
         solverProof: {
             algorithm: 'bfs',
             optimalityProven: true,
-            exploredNodes: 86,
+            exploredNodes: 94,
             maxNodesPolicy: 2000000
         }
     },
     5: {
-        schemaVersion: 1,
+        schemaVersion: APP_CONFIG.schemaVersion,
         generatorVersion: 1,
         level: 5,
         attempt: 1,
@@ -84,16 +83,16 @@ export const MILESTONE_FALLBACK_LEVELS = {
             []
         ],
         tubeShapes: ['cylinder', 'erlenmeyer', 'cylinder', 'erlenmeyer', 'cylinder', 'cylinder', 'cylinder'],
-        knownOptimalSteps: 18,
+        knownOptimalSteps: 16,
         solverProof: {
             algorithm: 'bfs',
             optimalityProven: true,
-            exploredNodes: 1240,
+            exploredNodes: 2443,
             maxNodesPolicy: 2000000
         }
     },
     10: {
-        schemaVersion: 1,
+        schemaVersion: APP_CONFIG.schemaVersion,
         generatorVersion: 1,
         level: 10,
         attempt: 1,
@@ -113,112 +112,75 @@ export const MILESTONE_FALLBACK_LEVELS = {
             []
         ],
         tubeShapes: ['bulb', 'erlenmeyer', 'cylinder', 'bulb', 'erlenmeyer', 'cylinder', 'bulb', 'cylinder', 'cylinder'],
-        knownOptimalSteps: 28,
+        knownOptimalSteps: 22,
         solverProof: {
             algorithm: 'bfs',
             optimalityProven: true,
-            exploredNodes: 8520,
+            exploredNodes: 10563,
             maxNodesPolicy: 2000000
         }
     }
 };
 /**
- * 第二層：無限階梯派生備援配方
- * 依難度參數與確定性規則構建標準可解置亂盤面
+ * 依可解盤面建立關卡定義
  * @param {number} level
+ * @param {import('./types.js').LevelParams} params
+ * @param {number} seed
+ * @param {string[][]} board
+ * @param {string[]} tubeShapes
+ * @param {import('./types.js').SolverResult} solveRes
  * @returns {import('./types.js').LevelDefinition}
  */
-export function deriveInfiniteFallbackLevel(level) {
-    if (MILESTONE_FALLBACK_LEVELS[level]) {
-        return JSON.parse(JSON.stringify(MILESTONE_FALLBACK_LEVELS[level]));
-    }
-    const params = getLevelParams(level);
-    const seed = deriveLevelSeed('liquid-cipher:fallback:v1', level, 1);
-    const prng = createPRNG(seed);
-    // 挑選色彩 ID
-    const selectedColorIds = REAGENTS.slice(0, params.colorCount).map(r => r.id);
-    // 建立目標全滿純色試管
-    const solvedTubes = selectedColorIds.map(c => new Array(params.capacity).fill(c));
-    // 打散所有色塊
-    const allSegments = [];
-    for (const tube of solvedTubes) {
-        for (const item of tube) {
-            allSegments.push(item);
-        }
-    }
-    prng.shuffle(allSegments);
-    // 重新填入試管
-    const initialBoard = [];
-    for (let i = 0; i < params.colorCount; i++) {
-        const tube = [];
-        for (let j = 0; j < params.capacity; j++) {
-            tube.push(allSegments.pop());
-        }
-        initialBoard.push(tube);
-    }
-    // 加入 2 支空管
-    for (let i = 0; i < params.emptyTubeCount; i++) {
-        initialBoard.push([]);
-    }
-    // 分配管型
-    const tubeShapes = [];
-    for (let i = 0; i < params.tubeCount; i++) {
-        tubeShapes.push(prng.choice(params.availableShapes));
-    }
-    // 驗證其可解性與步數
-    const solveRes = solveExact(initialBoard, params.capacity, EXACT_SOLVER_POLICY);
-    let optimalSteps = solveRes.steps;
-    let solverProof = {
-        algorithm: 'bfs',
-        optimalityProven: solveRes.optimalityProven,
-        exploredNodes: solveRes.exploredNodes,
-        maxNodesPolicy: EXACT_SOLVER_POLICY.maxNodesPerAttempt
-    };
-    if (solveRes.status !== 'solved') {
-        // 若隨機打散無法在政策內解決，使用輪替置換生成保證可解盤面
-        const safeBoard = [];
-        for (let i = 0; i < params.colorCount; i++) {
-            const tube = [];
-            for (let j = 0; j < params.capacity; j++) {
-                const colorIdx = (i + j) % params.colorCount;
-                tube.push(selectedColorIds[colorIdx]);
-            }
-            safeBoard.push(tube);
-        }
-        for (let i = 0; i < params.emptyTubeCount; i++) {
-            safeBoard.push([]);
-        }
-        const safeSolve = solveExact(safeBoard, params.capacity, EXACT_SOLVER_POLICY);
-        optimalSteps = safeSolve.steps > 0 ? safeSolve.steps : params.minSteps;
-        solverProof.optimalityProven = safeSolve.optimalityProven;
-        solverProof.exploredNodes = safeSolve.exploredNodes;
-        return {
-            schemaVersion: 1,
-            generatorVersion: 1,
-            level,
-            attempt: 0,
-            derivedSeed: seed,
-            capacity: params.capacity,
-            colorCount: params.colorCount,
-            tubeCount: params.tubeCount,
-            initialBoard: safeBoard,
-            tubeShapes,
-            knownOptimalSteps: optimalSteps,
-            solverProof
-        };
-    }
+function buildFallbackDefinition(level, params, seed, board, tubeShapes, solveRes) {
+    const proven = solveRes.status === 'solved';
     return {
-        schemaVersion: 1,
-        generatorVersion: 1,
+        schemaVersion: APP_CONFIG.schemaVersion,
+        generatorVersion: APP_CONFIG.generatorVersion,
         level,
         attempt: 0,
         derivedSeed: seed,
         capacity: params.capacity,
         colorCount: params.colorCount,
         tubeCount: params.tubeCount,
-        initialBoard,
+        initialBoard: board,
         tubeShapes,
-        knownOptimalSteps: optimalSteps,
-        solverProof
+        knownOptimalSteps: proven ? solveRes.steps : null,
+        solverProof: {
+            algorithm: 'bfs',
+            optimalityProven: proven,
+            exploredNodes: solveRes.exploredNodes,
+            maxNodesPolicy: EXACT_SOLVER_POLICY.maxNodesPerAttempt
+        }
     };
+}
+/**
+ * 第二層：無限派生備援配方
+ * 先嘗試確定性洗牌盤面；若無法在政策內證明可解，改用輪替排列盤面（構造上必定可解）。
+ * @param {number} level
+ * @returns {import('./types.js').LevelDefinition}
+ */
+export function deriveInfiniteFallbackLevel(level) {
+    if (MILESTONE_FALLBACK_LEVELS[level]) {
+        return structuredClone(MILESTONE_FALLBACK_LEVELS[level]);
+    }
+    const params = getLevelParams(level);
+    const seed = deriveLevelSeed(APP_CONFIG.fallbackSeedPrefix, level, 1);
+    const prng = createPRNG(seed);
+    const colorIds = REAGENTS.slice(0, params.colorCount).map(r => r.id);
+    const emptyTubes = Array.from({ length: params.emptyTubeCount }, () => []);
+    const segments = colorIds.flatMap(id => new Array(params.capacity).fill(id));
+    prng.shuffle(segments);
+    const shuffledBoard = colorIds.map((_, i) => segments.slice(i * params.capacity, (i + 1) * params.capacity));
+    shuffledBoard.push(...emptyTubes.map(t => [...t]));
+    const tubeShapes = assignTubeShapes(level, params.tubeCount, prng);
+    const shuffledRes = solveExact(shuffledBoard, params.capacity, EXACT_SOLVER_POLICY);
+    if (shuffledRes.status === 'solved') {
+        return buildFallbackDefinition(level, params, seed, shuffledBoard, tubeShapes, shuffledRes);
+    }
+    const rotatedBoard = colorIds.map((_, i) =>
+        Array.from({ length: params.capacity }, (_, j) => colorIds[(i + j) % params.colorCount])
+    );
+    rotatedBoard.push(...emptyTubes.map(t => [...t]));
+    const rotatedRes = solveExact(rotatedBoard, params.capacity, EXACT_SOLVER_POLICY);
+    return buildFallbackDefinition(level, params, seed, rotatedBoard, tubeShapes, rotatedRes);
 }

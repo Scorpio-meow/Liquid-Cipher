@@ -1,104 +1,20 @@
 /**
  * 液體解鎖 (Liquid Cipher) 全域常數與設定檔
  */
-// 12 種標準化實驗室化學試劑色譜定義
+// 12 種試劑色譜：色相與明度刻意拉開，確保同盤 12 色仍可辨識；glyph 為色盲模式的形狀符號
 export const REAGENTS = [
-    {
-        id: 'crimson',
-        name: '赤紅試劑',
-        hex: '#EF4444',
-        rgb: [239, 68, 68],
-        symbol: 'R1',
-        description: '高能活性紅色溶液'
-    },
-    {
-        id: 'cobalt',
-        name: '鈷藍試劑',
-        hex: '#3B82F6',
-        rgb: [59, 130, 246],
-        symbol: 'B2',
-        description: '深海鈷金屬穩定劑'
-    },
-    {
-        id: 'solar',
-        name: '日耀試劑',
-        hex: '#EAB308',
-        rgb: [234, 179, 8],
-        symbol: 'Y3',
-        description: '光合光譜激發黃液'
-    },
-    {
-        id: 'emerald',
-        name: '翡翠試劑',
-        hex: '#10B981',
-        rgb: [16, 185, 129],
-        symbol: 'G4',
-        description: '高純度翠綠催化液'
-    },
-    {
-        id: 'amethyst',
-        name: '紫晶試劑',
-        hex: '#A855F7',
-        rgb: [168, 85, 247],
-        symbol: 'P5',
-        description: '稀有紫晶共振液'
-    },
-    {
-        id: 'amber',
-        name: '琥珀試劑',
-        hex: '#F97316',
-        rgb: [249, 115, 22],
-        symbol: 'O6',
-        description: '高粘度琥珀凝膠'
-    },
-    {
-        id: 'cyan',
-        name: '電青試劑',
-        hex: '#06B6D4',
-        rgb: [6, 182, 212],
-        symbol: 'C7',
-        description: '超導電青離子水'
-    },
-    {
-        id: 'rose',
-        name: '薔薇試劑',
-        hex: '#F43F5E',
-        rgb: [244, 63, 94],
-        symbol: 'M8',
-        description: '低溫合成薔薇粉劑'
-    },
-    {
-        id: 'lime',
-        name: '熒綠試劑',
-        hex: '#84CC16',
-        rgb: [132, 204, 22],
-        symbol: 'L9',
-        description: '熒光生物標記液'
-    },
-    {
-        id: 'indigo',
-        name: '靛藍試劑',
-        hex: '#6366F1',
-        rgb: [99, 102, 241],
-        symbol: 'I10',
-        description: '深層靛藍合成基質'
-    },
-    {
-        id: 'teal',
-        name: '水鴨試劑',
-        hex: '#14B8A6',
-        rgb: [20, 184, 166],
-        symbol: 'T11',
-        description: '水合矽酸鹽緩衝液'
-    },
-    {
-        id: 'coral',
-        name: '珊瑚試劑',
-        hex: '#FB7185',
-        rgb: [251, 113, 133],
-        symbol: 'K12',
-        description: '微熱珊瑚有機試劑'
-    }
+    { id: 'crimson', name: '赤紅', hex: '#E5484D', rgb: [229, 72, 77], glyph: 'circle' },
+    { id: 'cobalt', name: '鈷藍', hex: '#3E63DD', rgb: [62, 99, 221], glyph: 'triangle' },
+    { id: 'solar', name: '日耀黃', hex: '#F5C542', rgb: [245, 197, 66], glyph: 'square' },
+    { id: 'emerald', name: '翡翠綠', hex: '#2FA36B', rgb: [47, 163, 107], glyph: 'diamond' },
+    { id: 'amethyst', name: '紫晶', hex: '#8E4EC6', rgb: [142, 78, 198], glyph: 'star' },
+    { id: 'amber', name: '琥珀橙', hex: '#F2711C', rgb: [242, 113, 28], glyph: 'plus' },
+    { id: 'cyan', name: '電青', hex: '#3CC6DD', rgb: [60, 198, 221], glyph: 'hexagon' },
+    { id: 'rose', name: '薔薇粉', hex: '#EE6FB0', rgb: [238, 111, 176], glyph: 'ring' },
+    { id: 'lime', name: '熒綠', hex: '#A8D13A', rgb: [168, 209, 58], glyph: 'cross' },
+    { id: 'umber', name: '赭棕', hex: '#A0703F', rgb: [160, 112, 63], glyph: 'bar' },
+    { id: 'pearl', name: '珍珠白', hex: '#E6E9EC', rgb: [230, 233, 236], glyph: 'chevron' },
+    { id: 'slate', name: '石板灰', hex: '#6F7C8C', rgb: [111, 124, 140], glyph: 'moon' }
 ];
 // 5 種實驗室幾何試管造型
 export const TUBE_SHAPES = [
@@ -108,31 +24,50 @@ export const TUBE_SHAPES = [
     'funnel',      // 漏斗型試管
     'hourglass'    // 沙漏型試管
 ];
-// Exact Solver 跨裝置確定性運算門禁政策
+// 關卡發布前 Exact Solver 門禁政策
 export const EXACT_SOLVER_POLICY = {
     maxNodesPerAttempt: 2000000,
     maxDepth: 160,
-    maxAttempts: 120,
-    uiWatchdogMs: 8000
+    maxAttempts: 120
+};
+// 遊戲中提示求解政策（盤面已部分進行，節點預算較發布門禁小）
+export const HINT_SOLVER_POLICY = {
+    maxNodesPerAttempt: 250000,
+    maxDepth: 160
+};
+// 背景 Worker 任務逾時（逾時即終止並重建 Worker）
+export const WORKER_POLICY = {
+    generateTimeoutMs: 20000,
+    hintTimeoutMs: 8000
 };
 // 儲存與產生器版本常數
 export const APP_CONFIG = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     generatorVersion: 1,
     rootSeedPrefix: 'liquid-cipher:v1',
-    storageKey: 'liquid_cipher_save_v1',
-    cachePrefix: 'liquid_cipher_level_cache_v1_'
+    fallbackSeedPrefix: 'liquid-cipher:fallback:v1',
+    storageKey: 'liquid_cipher_save_v2',
+    cachePrefix: 'liquid_cipher_level_v2_',
+    legacyStorageKey: 'liquid_cipher_save_v1',
+    legacyCachePrefix: 'liquid_cipher_level_cache_v1_'
 };
-// 幾何尺寸與物理參數常數
+// 評級門檻：步數 ≤ 最少步數為 S，超出不多於 rankAMaxOver 為 A，其餘 B
+export const RANK_POLICY = {
+    rankAMaxOver: 3
+};
+// 渲染與動畫參數
 export const RENDER_CONFIG = {
-    tubeWidth: 64,
-    tubeHeight: 200,
-    tubeSpacingMax: 110,
-    tubeSpacingMin: 70,
-    pourDurationMs: 480,
-    tiltAngleRad: Math.PI / 2.6,
-    liftOffsetPx: 28,
-    meniscusCurveDepth: 5,
-    bubbleCountPerPour: 8,
-    confettiParticleCount: 100
+    tubeAspect: 3.2,          // 試管高 / 寬
+    tubeMaxWidth: 80,
+    tubeMinWidth: 30,
+    cellFill: 0.58,           // 試管寬佔格寬比例
+    maxRows: 3,
+    liftRatio: 0.13,          // 選取時升起距離（相對管高）
+    labelSpace: 22,           // 管底編號區高度
+    pourDurationMs: 560,
+    tiltAngleRad: Math.PI * 0.55,  // 超過水平，瓶口低於瓶底才倒得出來
+    shakeDurationMs: 320,
+    hintDurationMs: 5000,
+    sealFlashMs: 700,
+    confettiParticleCount: 90
 };

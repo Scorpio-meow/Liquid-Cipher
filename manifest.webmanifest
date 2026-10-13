@@ -1,13 +1,13 @@
 {
   "name": "液體解鎖 (Liquid Cipher)",
   "short_name": "LiquidCipher",
-  "description": "結合 Cyber-Lab 視覺風格與狀態空間搜尋求解器的單一路徑無限線性化學試劑解密遊戲。",
+  "description": "把混在一起的試劑倒回各自的試管。每一關都經過求解器驗證可解，並以最少步數作為評級基準。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#02040a",
-  "theme_color": "#02040a",
+  "background_color": "#0c1013",
+  "theme_color": "#0c1013",
   "categories": [
     "games",
     "puzzle"

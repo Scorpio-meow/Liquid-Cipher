@@ -4,11 +4,10 @@
 /**
  * @typedef {Object} Reagent
  * @property {string} id - 試劑識別代碼 (e.g. 'crimson')
- * @property {string} name - 試劑中文名稱 (e.g. '赤紅試劑')
- * @property {string} hex - 十六進位色碼 (e.g. '#EF4444')
+ * @property {string} name - 試劑中文名稱 (e.g. '赤紅')
+ * @property {string} hex - 十六進位色碼 (e.g. '#E5484D')
  * @property {number[]} rgb - [R, G, B] 數值 (0~255)
- * @property {string} symbol - 色盲輔助符號代碼 (e.g. 'R1')
- * @property {string} description - 試劑描述
+ * @property {string} glyph - 色盲模式形狀符號 (e.g. 'circle')
  */
 /**
  * @typedef {Object} LevelParams
@@ -49,7 +48,7 @@
  * @property {number} [tubeCount] - 總試管數量
  * @property {string[][]} initialBoard - 初始盤面 (每個試管包含由底至頂的試劑 ID 陣列)
  * @property {string[]} tubeShapes - 每個試管對應的幾何外型
- * @property {number} knownOptimalSteps - 已證明之最短解法步數
+ * @property {number|null} knownOptimalSteps - 已證明之最短解法步數（未證明時為 null）
  * @property {SolverProof} solverProof - 求解器證明中繼資料
  * @property {MoveAction[]} [optimalPath] - 最優解路徑 (可選)
  */
@@ -63,20 +62,22 @@
  * @property {number} elapsedMs - 耗時毫秒
  */
 /**
- * @typedef {Object} SaveData
- * @property {number} schemaVersion - 存檔結構版本
- * @property {number} generatorVersion - 生成器版本
- * @property {number} activeLevel - 玩家目前正在進行的關卡
- * @property {number} highestUnlockedLevel - 玩家已解鎖的最高關卡
- * @property {number} levelSeed - 當前關卡派生種子
- * @property {number} generationAttempt - 當前關卡生成次數
- * @property {string[][]} initialBoard - 本關初始盤面
- * @property {string[][]} currentBoard - 本關當前進度盤面
- * @property {string[][][]} moveHistory - 撤銷歷史狀態堆疊
- * @property {string[][][]} redoHistory - 重做歷史狀態堆疊
- * @property {number} knownOptimalSteps - 本關已知最短步數
- * @property {number} elapsedMs - 當前關卡遊玩累計時間
- * @property {boolean} colorBlindMode - 色盲模式開關狀態
- * @property {boolean} soundEnabled - 音效開關狀態
+ * @typedef {Object} SessionSnapshot - 對局進度（只存移動序列，讀檔時由初始盤面重播驗證）
+ * @property {number} level
+ * @property {number} derivedSeed - 用於確認快照屬於同一份關卡定義
+ * @property {MoveAction[]} history
+ * @property {MoveAction[]} redo
+ * @property {number} elapsedMs
+ * @property {number} hintsUsed
+ */
+/**
+ * @typedef {Object} SaveProfile
+ * @property {number} schemaVersion
+ * @property {number} activeLevel - 目前所在關卡
+ * @property {number} highestLevel - 已抵達的最高關卡
+ * @property {{ colorBlind: boolean, sound: boolean }} settings
+ * @property {Record<string, { moves: number, timeMs: number }>} records - 各關最佳紀錄
+ * @property {boolean} seenHelp - 是否已看過首次說明
+ * @property {SessionSnapshot|null} session
  */
 export const TYPE_GUARD = true;

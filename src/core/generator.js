@@ -1,12 +1,13 @@
 /**
  * 液體解鎖 (Liquid Cipher) 關卡生成管線
- * 實作確定性 32-bit Seed 逆向置亂與發布前三重門禁嚴格驗證。
+ * 以確定性 32-bit Seed 洗牌產生候選盤面，並通過發布前三重門禁驗證。
  */
 import { APP_CONFIG, EXACT_SOLVER_POLICY, REAGENTS } from './constants.js';
 import { getLevelParams, assignTubeShapes } from './difficulty.js';
 import { deriveLevelSeed } from './hash.js';
 import { createPRNG } from './prng.js';
-import { solveExact, isBoardSolved, cloneBoard } from './solver.js';
+import { solveExact } from './solver.js';
+import { isBoardSolved } from './board.js';
 import { deriveInfiniteFallbackLevel } from './fallbackLevels.js';
 /**
  * 門禁 1: 驗證候選盤面結構合法性
@@ -38,7 +39,7 @@ export function validateBoardStructure(board, params) {
     return true;
 }
 /**
- * 依據目標狀態與逆向倒水操作置亂盤面
+ * 以 Fisher-Yates 洗牌所有色塊並填入試管，產生候選盤面
  * @param {import('./types.js').LevelParams} params
  * @param {import('./prng.js').createPRNG} prng
  * @returns {string[][]}
