@@ -1,17 +1,8 @@
-/**
- * 液體解鎖 (Liquid Cipher) 雙層無限 Fallback 備援資料庫與派生配方
- * 生成重試耗盡時提供可解盤面；最少步數僅在 Exact Solver 證明成功時填入，否則為 null。
- */
 import { APP_CONFIG, EXACT_SOLVER_POLICY, REAGENTS } from './constants.js';
 import { getLevelParams, assignTubeShapes } from './difficulty.js';
 import { createPRNG } from './prng.js';
 import { deriveLevelSeed } from './hash.js';
 import { solveExact } from './solver.js';
-/**
- * 第一層：固定里程碑預驗證關卡清單
- * 每個關卡均包含完整盤面定義與已知最短步數證明
- * @type {Record<number, import('./types.js').LevelDefinition>}
- */
 export const MILESTONE_FALLBACK_LEVELS = {
     1: {
         schemaVersion: APP_CONFIG.schemaVersion,
@@ -121,16 +112,6 @@ export const MILESTONE_FALLBACK_LEVELS = {
         }
     }
 };
-/**
- * 依可解盤面建立關卡定義
- * @param {number} level
- * @param {import('./types.js').LevelParams} params
- * @param {number} seed
- * @param {string[][]} board
- * @param {string[]} tubeShapes
- * @param {import('./types.js').SolverResult} solveRes
- * @returns {import('./types.js').LevelDefinition}
- */
 function buildFallbackDefinition(level, params, seed, board, tubeShapes, solveRes) {
     const proven = solveRes.status === 'solved';
     return {
@@ -153,12 +134,6 @@ function buildFallbackDefinition(level, params, seed, board, tubeShapes, solveRe
         }
     };
 }
-/**
- * 第二層：無限派生備援配方
- * 先嘗試確定性洗牌盤面；若無法在政策內證明可解，改用輪替排列盤面（構造上必定可解）。
- * @param {number} level
- * @returns {import('./types.js').LevelDefinition}
- */
 export function deriveInfiniteFallbackLevel(level) {
     if (MILESTONE_FALLBACK_LEVELS[level]) {
         return structuredClone(MILESTONE_FALLBACK_LEVELS[level]);

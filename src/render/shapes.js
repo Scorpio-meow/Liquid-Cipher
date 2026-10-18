@@ -1,27 +1,8 @@
-/**
- * 液體解鎖 (Liquid Cipher) 實驗室玻璃器皿外輪廓
- * 所有尺寸皆與試管寬高成比例，任何縮放下外型一致。
- */
-/**
- * 瓶口寬度（傾倒射流與瓶塞定位用）
- * @param {number} w
- * @param {string} shape
- * @returns {number}
- */
 export function mouthWidth(w, shape) {
     if (shape === 'erlenmeyer') return w * 0.56;
     if (shape === 'bulb') return w * 0.5;
     return w;
 }
-/**
- * 建立器皿外輪廓路徑（開口向上，不閉合）
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} x - 底部中心 X
- * @param {number} y - 底部 Y
- * @param {number} w - 寬度
- * @param {number} h - 高度
- * @param {string} shape - 'cylinder'|'erlenmeyer'|'bulb'|'funnel'|'hourglass'
- */
 export function defineTubePath(ctx, x, y, w, h, shape) {
     const hw = w / 2;
     ctx.beginPath();

@@ -1,11 +1,3 @@
-/**
- * 液體解鎖 (Liquid Cipher) 介面視圖
- * 只負責把狀態寫進 DOM：關卡狀態列、工具列可用性、設定按鈕、舞台遮罩、提示訊息與螢幕閱讀器播報。
- */
-/**
- * @param {number} ms
- * @returns {string} m:ss 或 h:mm:ss
- */
 export function formatDuration(ms) {
     const total = Math.max(0, Math.floor(ms / 1000));
     const h = Math.floor(total / 3600);
@@ -13,10 +5,6 @@ export function formatDuration(ms) {
     const s = String(total % 60).padStart(2, '0');
     return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
 }
-/**
- * @param {string} id
- * @returns {HTMLElement}
- */
 function byId(id) {
     const el = document.getElementById(id);
     if (!el) throw new Error(`缺少介面元素 #${id}`);
@@ -42,9 +30,6 @@ export class HudView {
             sound: byId('btn-sound')
         };
     }
-    /**
-     * @param {import('../core/session.js').GameSession} session
-     */
     render(session) {
         const def = session.levelDef;
         if (!def) return;
@@ -68,22 +53,13 @@ export class HudView {
         el.hint.disabled = solved;
         this.renderTime(session.stopwatch.elapsedMs);
     }
-    /**
-     * @param {number} ms
-     */
     renderTime(ms) {
         this.el.time.textContent = formatDuration(ms);
     }
-    /**
-     * @param {{ colorBlind: boolean, sound: boolean }} settings
-     */
     renderSettings(settings) {
         this.el.colorBlind.setAttribute('aria-pressed', String(settings.colorBlind));
         this.el.sound.setAttribute('aria-pressed', String(settings.sound));
     }
-    /**
-     * @param {boolean} busy
-     */
     setHintBusy(busy) {
         this.el.hint.classList.toggle('is-busy', busy);
         this.el.hint.setAttribute('aria-busy', String(busy));
@@ -96,16 +72,12 @@ export class StageOverlay {
         this.desc = byId('overlay-desc');
         this.bar = byId('overlay-bar');
         this.retry = byId('btn-retry');
-        /** @type {(() => void)|null} */
         this.onRetry = null;
         this.retry.addEventListener('click', () => this.onRetry && this.onRetry());
     }
     get visible() {
         return !this.root.hidden;
     }
-    /**
-     * @param {number} level
-     */
     showLoading(level) {
         this.root.classList.remove('is-error');
         this.title.textContent = `正在準備第 ${level} 關`;
@@ -114,10 +86,6 @@ export class StageOverlay {
         this.retry.hidden = true;
         this.root.hidden = false;
     }
-    /**
-     * @param {string} message
-     * @param {() => void} onRetry
-     */
     showError(message, onRetry) {
         this.root.classList.add('is-error');
         this.title.textContent = '關卡載入失敗';
@@ -138,10 +106,6 @@ export class Toaster {
         this.sr = byId('sr-status');
         this.timer = 0;
     }
-    /**
-     * @param {string} message
-     * @param {{ tone?: 'info'|'warn', durationMs?: number }} [options]
-     */
     show(message, options = {}) {
         const { tone = 'info', durationMs = 2400 } = options;
         clearTimeout(this.timer);
@@ -156,10 +120,6 @@ export class Toaster {
             toast.addEventListener('animationend', () => toast.remove(), { once: true });
         }, durationMs);
     }
-    /**
-     * 只播報給螢幕閱讀器，不顯示
-     * @param {string} message
-     */
     announce(message) {
         this.sr.textContent = '';
         requestAnimationFrame(() => {

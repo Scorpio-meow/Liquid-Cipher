@@ -1,14 +1,9 @@
-/**
- * 液體解鎖 (Liquid Cipher) PWA：Service Worker 註冊、安裝按鈕與新版本提示
- */
 export function initPWA() {
     if (!('serviceWorker' in navigator)) return;
     const btnInstall = document.getElementById('btn-install');
     const banner = document.getElementById('update-banner');
     const btnReload = document.getElementById('btn-reload');
-    /** @type {any} */
     let deferredPrompt = null;
-    /** @type {ServiceWorker|null} */
     let waitingWorker = null;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -26,9 +21,6 @@ export function initPWA() {
         await deferredPrompt.userChoice;
         deferredPrompt = null;
     });
-    /**
-     * @param {ServiceWorker} worker
-     */
     const offerUpdate = (worker) => {
         waitingWorker = worker;
         banner.hidden = false;

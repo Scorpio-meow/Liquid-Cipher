@@ -1,27 +1,11 @@
-/**
- * 液體解鎖 (Liquid Cipher) 舞台渲染器
- * 負責 High-DPI 畫布尺寸、排版、60fps 繪製迴圈與動畫（選取升起、傾倒、搖晃、封蓋、提示、慶祝粒子）。
- * 盤面資料一律從 source 讀取；傾倒動畫期間以動畫前快照覆寫來源與目標管。
- */
 import { RENDER_CONFIG } from '../core/constants.js';
 import { isTubeComplete } from '../core/board.js';
 import { getReagentRgbaStr, getReagentById } from '../core/color.js';
 import { computeStageLayout, hitTestLayout } from './layout.js';
 import { mouthWidth } from './shapes.js';
 import { paintTube, toBands } from './tubePainter.js';
-/**
- * @typedef {Object} StageSource
- * @property {() => string[][]} getBoard
- * @property {() => number} getCapacity
- * @property {() => boolean} getColorBlind
- */
 const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 const lerp = (a, b, t) => a + (b - a) * t;
-/**
- * 從液柱頂端移除 units（可為小數）
- * @param {import('./tubePainter.js').LiquidBand[]} bands
- * @param {number} units
- */
 function drainBands(bands, units) {
     let left = units;
     for (let i = bands.length - 1; i >= 0 && left > 0; i--) {
@@ -31,12 +15,6 @@ function drainBands(bands, units) {
     }
     return bands.filter(b => b.units > 1e-4);
 }
-/**
- * 在液柱頂端加入 units（可為小數）
- * @param {import('./tubePainter.js').LiquidBand[]} bands
- * @param {string} colorId
- * @param {number} units
- */
 function fillBands(bands, colorId, units) {
     if (units <= 0) return bands;
     const last = bands[bands.length - 1];
@@ -45,11 +23,6 @@ function fillBands(bands, colorId, units) {
     return bands;
 }
 export class StageRenderer {
-    /**
-     * @param {HTMLCanvasElement} canvas
-     * @param {StageSource} source
-     * @param {{ reducedMotion: boolean }} options
-     */
     constructor(canvas, source, options) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
@@ -58,28 +31,17 @@ export class StageRenderer {
         this.width = 0;
         this.height = 0;
         this.dpr = 1;
-        /** @type {string[]} */
         this.shapes = [];
-        /** @type {import('./layout.js').StageLayout} */
         this.layout = { tubes: [], lift: 0, segmentHeight: 0 };
-        /** @type {number|null} */
         this.selectedId = null;
-        /** @type {number|null} */
         this.hoverId = null;
-        /** @type {number|null} */
         this.focusId = null;
         this.showFocus = false;
-        /** @type {{ from: number, to: number, until: number }|null} */
         this.hint = null;
-        /** @type {Map<number, number>} 每支試管目前升起量 */
         this.lifts = new Map();
-        /** @type {Map<number, number>} */
         this.shakes = new Map();
-        /** @type {Map<number, number>} */
         this.seals = new Map();
-        /** @type {null | { move: import('../core/types.js').MoveAction, srcBefore: string[], tgtBefore: string[], start: number, duration: number, resolve: Function }} */
         this.pour = null;
-        /** @type {Array<{ x: number, y: number, vx: number, vy: number, r: number, color: string, life: number }>} */
         this.particles = [];
         this.lastFrame = 0;
         this.palette = this.readPalette();
@@ -99,10 +61,6 @@ export class StageRenderer {
     get isBusy() {
         return this.pour !== null;
     }
-    /**
-     * @param {number} width
-     * @param {number} height
-     */
     resize(width, height) {
         this.dpr = window.devicePixelRatio || 1;
         this.width = Math.max(1, Math.floor(width));
@@ -113,9 +71,6 @@ export class StageRenderer {
         this.canvas.style.height = `${this.height}px`;
         this.relayout();
     }
-    /**
-     * @param {string[]} shapes
-     */
     setLevel(shapes) {
         this.shapes = shapes;
         this.selectedId = null;
@@ -130,11 +85,6 @@ export class StageRenderer {
     relayout() {
         this.layout = computeStageLayout(this.shapes.length, this.shapes, this.width, this.height, this.source.getCapacity());
     }
-    /**
-     * @param {number} clientX
-     * @param {number} clientY
-     * @returns {number|null}
-     */
     hitTest(clientX, clientY) {
         const rect = this.canvas.getBoundingClientRect();
         if (rect.width === 0 || rect.height === 0) return null;
@@ -142,12 +92,6 @@ export class StageRenderer {
         const y = (clientY - rect.top) * (this.height / rect.height);
         return hitTestLayout(this.layout, x, y);
     }
-    /**
-     * @param {import('../core/types.js').MoveAction} move
-     * @param {string[]} srcBefore
-     * @param {string[]} tgtBefore
-     * @returns {Promise<void>}
-     */
     playPour(move, srcBefore, tgtBefore) {
         this.hint = null;
         const duration = this.reducedMotion ? RENDER_CONFIG.pourDurationMs * 0.4 : RENDER_CONFIG.pourDurationMs;
@@ -155,26 +99,18 @@ export class StageRenderer {
             this.pour = { move, srcBefore, tgtBefore, start: performance.now(), duration, resolve };
         });
     }
-    /** @param {number} id */
     shake(id) {
         this.shakes.set(id, performance.now());
     }
-    /** @param {number} id */
     flashSeal(id) {
         this.seals.set(id, performance.now());
     }
-    /**
-     * @param {{ from: number, to: number }} move
-     */
     showHint(move) {
         this.hint = { from: move.from, to: move.to, until: performance.now() + RENDER_CONFIG.hintDurationMs };
     }
     clearHint() {
         this.hint = null;
     }
-    /**
-     * 通關慶祝：從各完成管瓶口噴出該色液滴
-     */
     celebrate() {
         if (this.reducedMotion) return;
         const board = this.source.getBoard();
@@ -208,9 +144,6 @@ export class StageRenderer {
         };
         requestAnimationFrame(loop);
     }
-    /**
-     * @param {number} now
-     */
     frame(now) {
         const dt = Math.min(0.05, (now - (this.lastFrame || now)) / 1000);
         this.lastFrame = now;
@@ -221,10 +154,8 @@ export class StageRenderer {
         const board = this.source.getBoard();
         const capacity = this.source.getCapacity();
         const pourState = this.advancePour(now);
-        // 底座陰影與編號
         for (const t of this.layout.tubes) this.paintFloor(ctx, t);
         if (this.hint) this.paintHint(ctx, now);
-        // 一般試管（傾倒中的來源管最後畫，疊在最上層）
         for (const t of this.layout.tubes) {
             if (pourState && t.id === pourState.move.from) continue;
             this.paintRestingTube(ctx, t, board, capacity, pourState, now, dt);
@@ -232,9 +163,6 @@ export class StageRenderer {
         if (pourState) this.paintPouring(ctx, pourState, capacity);
         this.paintParticles(ctx, dt);
     }
-    /**
-     * @param {number} now
-     */
     advancePour(now) {
         if (!this.pour) return null;
         const p = Math.min(1, (now - this.pour.start) / this.pour.duration);
@@ -246,10 +174,6 @@ export class StageRenderer {
         }
         return state;
     }
-    /**
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {import('./layout.js').TubeLayout} t
-     */
     paintFloor(ctx, t) {
         ctx.save();
         ctx.fillStyle = this.palette.floor;
@@ -273,10 +197,6 @@ export class StageRenderer {
         ctx.fillText(String(t.id + 1), t.x, ly + 0.5);
         ctx.restore();
     }
-    /**
-     * @param {number} id
-     * @returns {import('./tubePainter.js').TubePaintState['emphasis']}
-     */
     emphasisOf(id) {
         if (this.selectedId === id) return 'selected';
         if (this.hint && this.hint.from === id) return 'hint-from';
@@ -284,15 +204,6 @@ export class StageRenderer {
         if (this.hoverId === id) return 'hover';
         return 'idle';
     }
-    /**
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {import('./layout.js').TubeLayout} t
-     * @param {string[][]} board
-     * @param {number} capacity
-     * @param {any} pourState
-     * @param {number} now
-     * @param {number} dt
-     */
     paintRestingTube(ctx, t, board, capacity, pourState, now, dt) {
         let layers = board[t.id] || [];
         let bands = toBands(layers);
@@ -329,18 +240,9 @@ export class StageRenderer {
         }, this.palette);
         ctx.restore();
     }
-    /**
-     * 傾倒階段的液體轉移比例：0.28 ~ 0.74 之間線性流動
-     * @param {number} p
-     */
     flowFraction(p) {
         return Math.max(0, Math.min(1, (p - 0.28) / 0.46));
     }
-    /**
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {any} ps
-     * @param {number} capacity
-     */
     paintPouring(ctx, ps, capacity) {
         const src = this.layout.tubes[ps.move.from];
         const tgt = this.layout.tubes[ps.move.to];
@@ -365,7 +267,6 @@ export class StageRenderer {
         const angle = dir * tilt * k;
         const flow = this.flowFraction(p);
         const bands = drainBands(toBands(ps.srcBefore), ps.move.amount * flow);
-        // 射流：從傾斜瓶口落到目標液面
         if (p >= 0.28 && p < 0.74) {
             const tgtUnits = ps.tgtBefore.length + ps.move.amount * flow;
             const surfaceY = tgt.y - tgtUnits * this.layout.segmentHeight;
@@ -390,13 +291,8 @@ export class StageRenderer {
             colorBlind: this.source.getColorBlind()
         }, this.palette);
         ctx.restore();
-        // 回到原位時保持升起，結束後由一般繪製平滑降下
         this.lifts.set(src.id, this.layout.lift);
     }
-    /**
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {number} now
-     */
     paintHint(ctx, now) {
         const src = this.layout.tubes[this.hint.from];
         const tgt = this.layout.tubes[this.hint.to];
@@ -418,7 +314,6 @@ export class StageRenderer {
         ctx.quadraticCurveTo(mx, my, tx, ty - 6);
         ctx.stroke();
         ctx.setLineDash([]);
-        // 箭頭方向取曲線終點切線
         const ang = Math.atan2(ty - 6 - my, tx - mx);
         ctx.translate(tx, ty - 4);
         ctx.rotate(ang);
@@ -430,10 +325,6 @@ export class StageRenderer {
         ctx.fill();
         ctx.restore();
     }
-    /**
-     * @param {CanvasRenderingContext2D} ctx
-     * @param {number} dt
-     */
     paintParticles(ctx, dt) {
         if (this.particles.length === 0) return;
         const step = dt * 60;

@@ -1,23 +1,4 @@
-/**
- * 液體解鎖 (Liquid Cipher) 輸入控制
- * 將指標與鍵盤事件轉為語意動作；不含遊戲規則。
- */
-/**
- * @typedef {'undo'|'redo'|'restart'|'hint'|'colorBlind'|'sound'|'help'|'cancel'} InputAction
- */
-/**
- * @typedef {Object} InputHandlers
- * @property {(id: number) => void} onTube - 選擇 / 倒入某支試管
- * @property {(action: InputAction) => void} onAction
- * @property {() => boolean} isBlocked - 有對話框開啟或關卡載入中時為 true
- */
 export class InputController {
-    /**
-     * @param {HTMLCanvasElement} canvas
-     * @param {import('../render/stage.js').StageRenderer} renderer
-     * @param {() => number} getTubeCount
-     * @param {InputHandlers} handlers
-     */
     constructor(canvas, renderer, getTubeCount, handlers) {
         this.canvas = canvas;
         this.renderer = renderer;
@@ -51,10 +32,6 @@ export class InputController {
             r.hoverId = null;
         });
     }
-    /**
-     * 方向鍵移動游標：左右在全部試管間循環，上下跨排移到最近的試管
-     * @param {string} key
-     */
     moveFocus(key) {
         const tubes = this.renderer.layout.tubes;
         if (tubes.length === 0) return;
@@ -94,7 +71,6 @@ export class InputController {
                 return;
             }
             if ((key === 'enter' || key === ' ') && this.renderer.showFocus && this.renderer.focusId !== null) {
-                // 讓焦點中的按鈕保有原生 Enter/Space 行為
                 if (document.activeElement instanceof HTMLButtonElement) return;
                 e.preventDefault();
                 this.handlers.onTube(this.renderer.focusId);
@@ -109,7 +85,6 @@ export class InputController {
                 }
                 return;
             }
-            /** @type {Record<string, InputAction>} */
             const map = { z: 'undo', y: 'redo', r: 'restart', h: 'hint', c: 'colorBlind', m: 'sound', '?': 'help', '/': 'help', escape: 'cancel' };
             const action = map[key];
             if (!action) return;
@@ -119,7 +94,6 @@ export class InputController {
         });
     }
     bindButtons() {
-        /** @type {Array<[string, InputAction]>} */
         const buttons = [
             ['btn-undo', 'undo'],
             ['btn-redo', 'redo'],

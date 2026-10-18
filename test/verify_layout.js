@@ -1,6 +1,3 @@
-/**
- * 自適應排版與點擊判定驗證：各種螢幕尺寸下試管不重疊、不出界、每支試管都點得到
- */
 import { computeStageLayout, hitTestLayout, splitRows } from '../src/render/layout.js';
 import { RENDER_CONFIG } from '../src/core/constants.js';
 function assert(condition, message) {

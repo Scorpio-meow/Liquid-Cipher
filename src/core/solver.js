@@ -1,7 +1,3 @@
-/**
- * 液體解鎖 (Liquid Cipher) 狀態空間搜尋求解器
- * Exact Solver 以 BFS 證明最短解；路徑以父節點指標回溯，避免每個節點複製整條路徑。
- */
 import {
     applyMove,
     getTopColorBlock,
@@ -9,15 +5,6 @@ import {
     isTubeComplete,
     serializeBoard
 } from './board.js';
-/**
- * 求解用的合法移動（含對稱剪枝）
- * - 已完成的滿管不再移出
- * - 純色管倒入空管沒有進展，略過
- * - 同一來源只探索第一支空管
- * @param {string[][]} board
- * @param {number} capacity
- * @returns {import('./types.js').MoveAction[]}
- */
 export function getValidMoves(board, capacity) {
     const moves = [];
     for (let from = 0; from < board.length; from++) {
@@ -41,12 +28,6 @@ export function getValidMoves(board, capacity) {
     }
     return moves;
 }
-/**
- * @param {{ parent: number, move: import('./types.js').MoveAction|null }[]} nodes
- * @param {number} index
- * @param {import('./types.js').MoveAction} lastMove
- * @returns {import('./types.js').MoveAction[]}
- */
 function tracePath(nodes, index, lastMove) {
     const path = [lastMove];
     for (let i = index; nodes[i].parent !== -1; i = nodes[i].parent) {
@@ -54,13 +35,6 @@ function tracePath(nodes, index, lastMove) {
     }
     return path.reverse();
 }
-/**
- * Exact Solver：BFS 於無權重圖首次抵達即為最短解
- * @param {string[][]} initialBoard
- * @param {number} capacity
- * @param {{ maxNodesPerAttempt: number, maxDepth: number }} policy
- * @returns {import('./types.js').SolverResult}
- */
 export function solveExact(initialBoard, capacity, policy) {
     const startTime = Date.now();
     const result = (status, path, exploredNodes) => ({
@@ -74,7 +48,6 @@ export function solveExact(initialBoard, capacity, policy) {
     if (isBoardSolved(initialBoard, capacity)) {
         return result('solved', [], 1);
     }
-    /** @type {{ board: string[][]|null, parent: number, move: import('./types.js').MoveAction|null, depth: number }[]} */
     const nodes = [{ board: initialBoard, parent: -1, move: null, depth: 0 }];
     const visited = new Set([serializeBoard(initialBoard)]);
     let depthLimited = false;
@@ -84,7 +57,7 @@ export function solveExact(initialBoard, capacity, policy) {
         }
         const current = nodes[head];
         const board = current.board;
-        current.board = null; // 已展開節點只保留回溯資訊
+        current.board = null;
         if (current.depth >= policy.maxDepth) {
             depthLimited = true;
             continue;
@@ -102,13 +75,6 @@ export function solveExact(initialBoard, capacity, policy) {
     }
     return result(depthLimited ? 'depth_exceeded' : 'unsolvable', [], nodes.length);
 }
-/**
- * 遊戲中提示：回傳最短解的第一步與求解狀態
- * @param {string[][]} board
- * @param {number} capacity
- * @param {{ maxNodesPerAttempt: number, maxDepth: number }} policy
- * @returns {{ status: import('./types.js').SolverResult['status'], move: import('./types.js').MoveAction|null, remainingSteps: number }}
- */
 export function solveHint(board, capacity, policy) {
     const res = solveExact(board, capacity, policy);
     return {

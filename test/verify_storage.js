@@ -1,6 +1,3 @@
-/**
- * 存檔層（SaveStore）驗證：容錯讀取、關卡快取修剪、v1 遷移、最佳紀錄
- */
 import { SaveStore, createDefaultProfile, updateRecord } from '../src/core/storage.js';
 import { APP_CONFIG } from '../src/core/constants.js';
 import { generateLevel } from '../src/core/generator.js';
@@ -20,10 +17,8 @@ class FakeStorage {
     removeItem(k) { this.map.delete(k); }
 }
 console.log('--- 正在執行存檔層測試 ---');
-// 1. 損毀或缺欄位的存檔不應讓遊戲崩潰
 {
     const store = new SaveStore(new FakeStorage({ [APP_CONFIG.storageKey]: '{not json' }));
-    // 預期的解析失敗警告改為攔截並檢查，不印到輸出
     const warnings = [];
     const originalWarn = console.warn;
     console.warn = (...args) => warnings.push(args);
@@ -44,7 +39,6 @@ console.log('--- 正在執行存檔層測試 ---');
     assert(Object.keys(q.records).length === 0, '不合法的紀錄應被丟棄');
     console.log('✓ 損毀存檔容錯驗證通過');
 }
-// 2. 關卡快取只保留目前及之後的關卡
 {
     const backend = new FakeStorage();
     const store = new SaveStore(backend);
@@ -57,7 +51,6 @@ console.log('--- 正在執行存檔層測試 ---');
     assert(store.getLevel(4) === null, '形狀不合法的快取不可被讀出');
     console.log('✓ 關卡快取修剪與驗證通過');
 }
-// 3. v1 存檔遷移
 {
     const backend = new FakeStorage({
         [APP_CONFIG.legacyStorageKey]: JSON.stringify({ schemaVersion: 1, activeLevel: 12, highestUnlockedLevel: 12, colorBlindMode: true, soundEnabled: false }),
@@ -73,7 +66,6 @@ console.log('--- 正在執行存檔層測試 ---');
     assert(new SaveStore(backend).loadProfile().activeLevel === 12, '遷移結果應寫入新存檔');
     console.log('✓ v1 存檔遷移驗證通過');
 }
-// 4. 最佳紀錄
 {
     const p = createDefaultProfile();
     assert(updateRecord(p, 5, { moves: 20, timeMs: 9000 }).isRecord, '首次通關即為紀錄');

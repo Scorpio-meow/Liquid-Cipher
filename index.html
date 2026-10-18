@@ -22,7 +22,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./logo/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="./src/styles/main.css">
     <link rel="stylesheet" href="./src/styles/components.css">
@@ -49,8 +50,8 @@
                     </svg>
                     <span>安裝</span>
                 </button>
-                <button id="btn-colorblind" class="btn-icon" type="button" aria-pressed="false"
-                    aria-label="色盲符號" data-tip="色盲符號 (C)">
+                <button id="btn-colorblind" class="btn-icon" type="button" aria-pressed="false" aria-label="色盲符號"
+                    data-tip="色盲符號 (C)">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <circle cx="7" cy="7" r="3" />
                         <path d="M17 3.8 20.6 10h-7.2z" />
@@ -77,7 +78,6 @@
                 </button>
             </div>
         </header>
-
         <section class="hud" aria-label="關卡狀態">
             <div class="hud-level">
                 <span class="hud-eyebrow">關卡</span>
@@ -99,17 +99,15 @@
                 </div>
             </dl>
             <div class="hud-progress">
-                <div class="progress-track" role="progressbar" id="hud-progress" aria-label="已完成試管"
-                    aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+                <div class="progress-track" role="progressbar" id="hud-progress" aria-label="已完成試管" aria-valuemin="0"
+                    aria-valuemax="0" aria-valuenow="0">
                     <span class="progress-fill" id="hud-progress-fill"></span>
                 </div>
                 <span class="progress-label" id="hud-progress-label">0 / 0</span>
             </div>
         </section>
-
         <main class="stage" id="stage" tabindex="-1">
-            <canvas id="game-canvas"
-                aria-label="試管盤面：點選一支試管再點選目標試管倒入；也可用數字鍵或方向鍵選擇、Enter 確認。"></canvas>
+            <canvas id="game-canvas" aria-label="試管盤面：點選一支試管再點選目標試管倒入；也可用數字鍵或方向鍵選擇、Enter 確認。"></canvas>
             <div class="stage-overlay" id="stage-overlay" hidden>
                 <div class="overlay-card">
                     <p class="overlay-title" id="overlay-title"></p>
@@ -121,7 +119,6 @@
             <div class="toast-region" id="toast-region" aria-live="polite"></div>
             <p class="sr-only" id="sr-status" aria-live="polite"></p>
         </main>
-
         <nav class="toolbar" aria-label="操作">
             <button id="btn-undo" class="tool" type="button" disabled>
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -139,7 +136,8 @@
             </button>
             <button id="btn-hint" class="tool tool-primary" type="button">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M9.2 18h5.6M10.2 21h3.6M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" />
+                    <path
+                        d="M9.2 18h5.6M10.2 21h3.6M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" />
                 </svg>
                 <span class="tool-label">提示</span>
                 <kbd>H</kbd>
@@ -153,7 +151,6 @@
             </button>
         </nav>
     </div>
-
     <dialog id="win-dialog" class="dialog dialog-win" aria-labelledby="win-title">
         <div class="win-head">
             <div class="win-rank" id="win-rank" data-rank="S">S</div>
@@ -190,7 +187,6 @@
             </button>
         </div>
     </dialog>
-
     <dialog id="help-dialog" class="dialog dialog-help" aria-labelledby="help-title">
         <div class="dialog-top">
             <h2 class="dialog-title" id="help-title">怎麼玩</h2>
@@ -212,14 +208,38 @@
             <section>
                 <h3>鍵盤</h3>
                 <dl class="keys">
-                    <div><dt><kbd>1</kbd>–<kbd>9</kbd> <kbd>0</kbd></dt><dd>選擇第 1–10 支試管</dd></div>
-                    <div><dt><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></dt><dd>移動游標</dd></div>
-                    <div><dt><kbd>Enter</kbd> <kbd>Space</kbd></dt><dd>拿起 / 倒入游標所在試管</dd></div>
-                    <div><dt><kbd>Z</kbd> <kbd>Y</kbd></dt><dd>復原 / 重做</dd></div>
-                    <div><dt><kbd>H</kbd></dt><dd>提示下一步</dd></div>
-                    <div><dt><kbd>R</kbd></dt><dd>重置本關</dd></div>
-                    <div><dt><kbd>C</kbd> <kbd>M</kbd></dt><dd>色盲符號 / 音效</dd></div>
-                    <div><dt><kbd>Esc</kbd></dt><dd>放下試管</dd></div>
+                    <div>
+                        <dt><kbd>1</kbd>–<kbd>9</kbd> <kbd>0</kbd></dt>
+                        <dd>選擇第 1–10 支試管</dd>
+                    </div>
+                    <div>
+                        <dt><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></dt>
+                        <dd>移動游標</dd>
+                    </div>
+                    <div>
+                        <dt><kbd>Enter</kbd> <kbd>Space</kbd></dt>
+                        <dd>拿起 / 倒入游標所在試管</dd>
+                    </div>
+                    <div>
+                        <dt><kbd>Z</kbd> <kbd>Y</kbd></dt>
+                        <dd>復原 / 重做</dd>
+                    </div>
+                    <div>
+                        <dt><kbd>H</kbd></dt>
+                        <dd>提示下一步</dd>
+                    </div>
+                    <div>
+                        <dt><kbd>R</kbd></dt>
+                        <dd>重置本關</dd>
+                    </div>
+                    <div>
+                        <dt><kbd>C</kbd> <kbd>M</kbd></dt>
+                        <dd>色盲符號 / 音效</dd>
+                    </div>
+                    <div>
+                        <dt><kbd>Esc</kbd></dt>
+                        <dd>放下試管</dd>
+                    </div>
                 </dl>
             </section>
             <section>
@@ -228,12 +248,10 @@
             </section>
         </div>
     </dialog>
-
     <div class="update-banner" id="update-banner" role="status" hidden>
         <span>新版本已下載完成</span>
         <button id="btn-reload" class="btn-chip" type="button">重新載入</button>
     </div>
-
     <script type="module" src="./src/main.js"></script>
 </body>
 

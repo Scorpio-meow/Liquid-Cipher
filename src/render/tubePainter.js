@@ -1,29 +1,7 @@
-/**
- * 液體解鎖 (Liquid Cipher) 單支試管繪製
- * 座標系：原點為瓶口中心，管身向下延伸 height；呼叫端負責平移與旋轉。
- */
 import { defineTubePath, mouthWidth } from './shapes.js';
 import { usableHeight } from './layout.js';
 import { getAccessibleTextColor, getReagentGlyph, getReagentRgbaStr } from '../core/color.js';
-/**
- * @typedef {Object} LiquidBand - 連續同色液柱（單位數可為小數，用於傾倒動畫）
- * @property {string} colorId
- * @property {number} units
- */
-/**
- * @typedef {Object} TubePaintState
- * @property {'idle'|'hover'|'selected'|'hint-from'|'hint-to'} emphasis
- * @property {boolean} complete
- * @property {number} seal - 0 ~ 1 完成封蓋閃光強度
- * @property {boolean} colorBlind
- */
-/**
- * 盤面試管陣列 → 合併相鄰同色的液柱
- * @param {string[]} layers
- * @returns {LiquidBand[]}
- */
 export function toBands(layers) {
-    /** @type {LiquidBand[]} */
     const bands = [];
     for (const c of layers) {
         const last = bands[bands.length - 1];
@@ -32,14 +10,6 @@ export function toBands(layers) {
     }
     return bands;
 }
-/**
- * 色盲模式形狀符號
- * @param {CanvasRenderingContext2D} ctx
- * @param {string} glyph
- * @param {number} cx
- * @param {number} cy
- * @param {number} r
- */
 export function drawGlyph(ctx, glyph, cx, cy, r) {
     ctx.beginPath();
     const poly = (pts) => {
@@ -125,15 +95,6 @@ export function drawGlyph(ctx, glyph, cx, cy, r) {
             throw new Error(`未知的符號: ${glyph}`);
     }
 }
-/**
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} w
- * @param {number} h
- * @param {string} shape
- * @param {LiquidBand[]} bands
- * @param {number} capacity
- * @param {TubePaintState} state
- */
 function paintLiquid(ctx, w, h, shape, bands, capacity, state) {
     const segH = usableHeight(h) / capacity;
     ctx.save();
@@ -149,7 +110,6 @@ function paintLiquid(ctx, w, h, shape, bands, capacity, state) {
         ctx.fillStyle = getReagentRgbaStr(band.colorId, 1);
         ctx.fillRect(-w, top, w * 2, bottom - top + 0.6);
         if (i === bands.length - 1) {
-            // 液面：一道亮邊模擬彎月面
             ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
             ctx.fillRect(-w, top, w * 2, Math.max(1.5, segH * 0.07));
         }
@@ -168,7 +128,6 @@ function paintLiquid(ctx, w, h, shape, bands, capacity, state) {
         }
         filled += band.units;
     });
-    // 圓柱體光影：左亮右暗
     const shade = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
     shade.addColorStop(0, 'rgba(255, 255, 255, 0.16)');
     shade.addColorStop(0.35, 'rgba(255, 255, 255, 0.0)');
@@ -178,15 +137,6 @@ function paintLiquid(ctx, w, h, shape, bands, capacity, state) {
     ctx.fillRect(-w, h - filled * segH, w * 2, filled * segH);
     ctx.restore();
 }
-/**
- * 繪製試管（不含底座陰影與編號）
- * @param {CanvasRenderingContext2D} ctx
- * @param {{ width: number, height: number, shape: string }} tube
- * @param {LiquidBand[]} bands
- * @param {number} capacity
- * @param {TubePaintState} state
- * @param {{ accent: string, glass: string, glassStrong: string }} palette
- */
 export function paintTube(ctx, tube, bands, capacity, state, palette) {
     const { width: w, height: h, shape } = tube;
     paintLiquid(ctx, w, h, shape, bands, capacity, state);
@@ -203,13 +153,11 @@ export function paintTube(ctx, tube, bands, capacity, state, palette) {
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.shadowBlur = 0;
-    // 瓶口唇緣
     ctx.lineWidth = emphasized ? 2 : 1.5;
     ctx.beginPath();
     const lipW = mouthWidth(w, shape);
     ctx.ellipse(0, 0, lipW / 2 + 2, 2.5, 0, 0, Math.PI * 2);
     ctx.stroke();
-    // 玻璃反光
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -222,14 +170,6 @@ export function paintTube(ctx, tube, bands, capacity, state, palette) {
         paintStopper(ctx, lipW, h, bands[0].colorId, state.seal);
     }
 }
-/**
- * 完成管的瓶塞
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} lipW
- * @param {number} h
- * @param {string} colorId
- * @param {number} seal
- */
 function paintStopper(ctx, lipW, h, colorId, seal) {
     const sw = lipW * 0.78;
     const sh = Math.max(6, h * 0.06);

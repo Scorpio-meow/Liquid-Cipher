@@ -1,6 +1,3 @@
-/**
- * 對局狀態機（GameSession）與盤面規則驗證
- */
 import { GameSession, computeRank } from '../src/core/session.js';
 import { evaluatePour, applyMoveInPlace, revertMoveInPlace, cloneBoard, hasAnyLegalMove } from '../src/core/board.js';
 import { generateLevel } from '../src/core/generator.js';
@@ -11,7 +8,6 @@ function assert(condition, message) {
     }
 }
 console.log('--- 正在執行對局狀態機與規則測試 ---');
-// 1. 傾倒規則與拒絕原因
 {
     const board = [['crimson', 'cobalt', 'cobalt'], ['cobalt'], ['crimson', 'crimson', 'crimson', 'solar'], []];
     assert(evaluatePour(board, 4, 0, 0).reason === 'same-tube', '同管應拒絕');
@@ -27,7 +23,6 @@ console.log('--- 正在執行對局狀態機與規則測試 ---');
     assert(!hasAnyLegalMove([['crimson', 'cobalt'], ['cobalt', 'crimson']], 2), '兩支滿管且頂色不同時無合法步');
     console.log('✓ 傾倒規則、拒絕原因與逆運算驗證通過');
 }
-// 2. 倒水 / 復原 / 重做 / 版本號 / 事件
 {
     let clock = 0;
     const session = new GameSession(() => clock);
@@ -60,7 +55,6 @@ console.log('--- 正在執行對局狀態機與規則測試 ---');
     assert(events >= path.length + 3, '每次狀態變化都要發出 change 事件');
     console.log('✓ 倒水、復原、重做、計時與通關判定驗證通過');
 }
-// 3. 快照重播還原與竄改防護
 {
     const def = generateLevel(3);
     const a = new GameSession(() => 0);
@@ -83,7 +77,6 @@ console.log('--- 正在執行對局狀態機與規則測試 ---');
     assert(new GameSession(() => 0).load(def, otherSeed) === false, '種子不符的快照必須被拒絕');
     console.log('✓ 快照重播還原與竄改防護驗證通過');
 }
-// 4. 評級與碼表
 {
     assert(computeRank(10, 10) === 'S', '等於最少步數為 S');
     assert(computeRank(13, 10) === 'A', '超出 3 步內為 A');

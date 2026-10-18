@@ -1,11 +1,7 @@
-/**
- * PWA 設定與 Service Worker 靜態快取驗證測試
- */
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { resolve, join } from 'path';
 console.log('--- 正在執行 PWA 設定與離線快取驗證測試 ---');
 const projectRoot = resolve('.');
-// 測試 1: 驗證 manifest.webmanifest 正確性
 {
     const manifestPath = join(projectRoot, 'manifest.webmanifest');
     if (!existsSync(manifestPath)) {
@@ -35,14 +31,12 @@ const projectRoot = resolve('.');
     }
     console.log(`✓ Web App Manifest 格式與 ${manifest.icons.length} 個圖標路徑檢驗通過`);
 }
-// 測試 2: 驗證 sw.js 與預快取資源清單
 {
     const swPath = join(projectRoot, 'sw.js');
     if (!existsSync(swPath)) {
         throw new Error('找不到 sw.js 檔案！');
     }
     const swContent = readFileSync(swPath, 'utf-8');
-    // 解析 PRECACHE_ASSETS 陣列
     const match = swContent.match(/const\s+PRECACHE_ASSETS\s*=\s*\[([\s\S]*?)\];/);
     if (!match) {
         throw new Error('無法從 sw.js 解析 PRECACHE_ASSETS 清單！');
@@ -58,7 +52,6 @@ const projectRoot = resolve('.');
             throw new Error(`sw.js 預快取清單中的檔案不存在: ${relPath}`);
         }
     }
-    // 反向檢查：src/ 下每個模組都必須在預快取清單中，否則離線時會載入失敗
     const srcFiles = readdirSync(join(projectRoot, 'src'), { recursive: true })
         .map(f => `./src/${String(f).split('\\').join('/')}`)
         .filter(f => f.endsWith('.js') || f.endsWith('.css'));
@@ -69,7 +62,6 @@ const projectRoot = resolve('.');
     }
     console.log(`✓ Service Worker 預快取清單中全部 ${assetPaths.length} 個核心資源均確認存在，且涵蓋 src/ 全部 ${srcFiles.length} 個模組`);
 }
-// 測試 3: 驗證 index.html 中的 PWA 元素宣告
 {
     const htmlPath = join(projectRoot, 'index.html');
     const html = readFileSync(htmlPath, 'utf-8');

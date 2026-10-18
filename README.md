@@ -145,7 +145,6 @@ Liquid-Cipher/
 │   │   └── components.css      # 頂列、狀態列、舞台、工具列、對話框、提示訊息
 │   ├── core/                   # 純邏輯，不碰 DOM
 │   │   ├── constants.js        # 試劑色譜、管型、求解與渲染參數
-│   │   ├── types.js            # JSDoc 型別定義
 │   │   ├── board.js            # 傾倒規則、通關判定、盤面工具（純函式）
 │   │   ├── session.js          # 對局狀態機：移動歷史、復原 / 重做、快照重播、計時、評級
 │   │   ├── stopwatch.js        # 無漂移碼表

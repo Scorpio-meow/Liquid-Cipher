@@ -1,7 +1,3 @@
-/**
- * 液體解鎖 (Liquid Cipher) 對話框
- * 使用原生 <dialog>：焦點圈限、Esc 與背景互動由瀏覽器處理。
- */
 import { formatDuration } from './hud.js';
 const RANK_TITLES = {
     S: '最少步數完成，一步不差',
@@ -9,21 +5,14 @@ const RANK_TITLES = {
     B: '分離完成',
     none: '分離完成'
 };
-/**
- * @param {string} id
- * @returns {HTMLElement}
- */
 function byId(id) {
     const el = document.getElementById(id);
     if (!el) throw new Error(`缺少介面元素 #${id}`);
     return el;
 }
 export class WinDialog {
-    /**
-     * @param {{ onNext: () => void, onReplay: () => void }} handlers
-     */
     constructor(handlers) {
-        this.dialog = /** @type {HTMLDialogElement} */ (byId('win-dialog'));
+        this.dialog = (byId('win-dialog'));
         this.el = {
             rank: byId('win-rank'),
             eyebrow: byId('win-eyebrow'),
@@ -42,7 +31,6 @@ export class WinDialog {
             this.close();
             handlers.onReplay();
         });
-        // 通關後必須選擇下一步，不允許 Esc 關閉留在已完成盤面
         this.dialog.addEventListener('cancel', (e) => e.preventDefault());
         this.dialog.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 'r' && !e.ctrlKey && !e.metaKey) {
@@ -55,9 +43,6 @@ export class WinDialog {
     get isOpen() {
         return this.dialog.open;
     }
-    /**
-     * @param {{ level: number, moves: number, optimal: number|null, timeMs: number, hints: number, rank: 'S'|'A'|'B'|null, record: { previous: { moves: number, timeMs: number }|null, isRecord: boolean } }} result
-     */
     open(result) {
         const rankKey = result.rank ?? 'none';
         this.el.rank.dataset.rank = rankKey;
@@ -86,9 +71,8 @@ export class WinDialog {
 }
 export class HelpDialog {
     constructor() {
-        this.dialog = /** @type {HTMLDialogElement} */ (byId('help-dialog'));
+        this.dialog = (byId('help-dialog'));
         byId('btn-close-help').addEventListener('click', () => this.close());
-        // 點擊背景關閉
         this.dialog.addEventListener('click', (e) => {
             if (e.target === this.dialog) this.close();
         });

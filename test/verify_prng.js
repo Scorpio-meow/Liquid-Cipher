@@ -1,6 +1,3 @@
-/**
- * 確定性 PRNG 與 Hash 演算法驗證腳本
- */
 import { hash32, deriveLevelSeed } from '../src/core/hash.js';
 import { createPRNG } from '../src/core/prng.js';
 function assert(condition, message) {
@@ -9,7 +6,6 @@ function assert(condition, message) {
     }
 }
 console.log('--- 正在執行 PRNG 與 Hash 演算法測試 ---');
-// 1. 測試 FNV-1a 32-bit 雜湊穩定性
 const hash1 = hash32('liquid-cipher:v1:level:37:attempt:1');
 const hash2 = hash32('liquid-cipher:v1:level:37:attempt:1');
 const hash3 = hash32('liquid-cipher:v1:level:37:attempt:2');
@@ -18,14 +14,12 @@ assert(hash1 >= 0 && hash1 <= 4294967295, '雜湊結果必須在 unsigned 32-bit
 assert(hash1 === hash2, '相同字串之雜湊結果必須完全一致');
 assert(hash1 !== hash3, '不同字串之雜湊結果必須具備良好分散性');
 console.log('✓ FNV-1a 32-bit 雜湊驗證通過');
-// 2. 測試 deriveLevelSeed
 const seedA = deriveLevelSeed('liquid-cipher:v1', 5, 2);
 const seedB = deriveLevelSeed('liquid-cipher:v1', 5, 2);
 const seedC = deriveLevelSeed('liquid-cipher:v1', 6, 2);
 assert(seedA === seedB, '相同關卡與 attempt 必須派生相同種子');
 assert(seedA !== seedC, '不同關卡必須派生不同種子');
 console.log('✓ 種子派生函式驗證通過');
-// 3. 測試 Mulberry32 PRNG 數列重現性
 const prng1 = createPRNG(seedA);
 const prng2 = createPRNG(seedA);
 for (let i = 0; i < 50; i++) {

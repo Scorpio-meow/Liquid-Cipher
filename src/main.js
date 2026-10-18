@@ -1,7 +1,3 @@
-/**
- * 液體解鎖 (Liquid Cipher) 應用程式進入點
- * 協調對局狀態、存檔、背景求解、舞台渲染與介面；遊戲規則本身在 core/ 內。
- */
 import { WORKER_POLICY } from './core/constants.js';
 import { isTubeComplete } from './core/board.js';
 import { GameSession } from './core/session.js';
@@ -18,9 +14,6 @@ const POUR_REJECT_MESSAGES = {
     'target-full': '目標試管已經滿了',
     'color-mismatch': '頂層顏色不同，不能倒入'
 };
-/**
- * @returns {Storage|null}
- */
 function getLocalStorage() {
     try {
         return window.localStorage;
@@ -29,9 +22,6 @@ function getLocalStorage() {
         return null;
     }
 }
-/**
- * @param {number|number[]} pattern
- */
 function vibrate(pattern) {
     if ('vibrate' in navigator) navigator.vibrate(pattern);
 }
@@ -45,8 +35,8 @@ class App {
         this.solver = new SolverClient(typeof Worker === 'undefined'
             ? null
             : () => new Worker(new URL('./workers/solverWorker.js', import.meta.url), { type: 'module' }));
-        this.canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('game-canvas'));
-        this.stageEl = /** @type {HTMLElement} */ (document.getElementById('stage'));
+        this.canvas = (document.getElementById('game-canvas'));
+        this.stageEl = (document.getElementById('stage'));
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         this.renderer = new StageRenderer(this.canvas, {
             getBoard: () => this.session.board,
@@ -66,11 +56,9 @@ class App {
             onAction: (action) => this.handleAction(action),
             isBlocked: () => this.win.isOpen || this.help.isOpen || this.overlay.visible || !this.session.levelDef
         });
-        /** @type {{ level: number, promise: Promise<import('./core/types.js').LevelDefinition> }|null} */
         this.prefetch = null;
         this.loadToken = 0;
         this.hintPending = false;
-        /** @type {number[]} 傾倒動畫期間的點選，動畫結束後依序處理，避免快速操作被吞掉 */
         this.inputQueue = [];
     }
     async init() {
@@ -104,20 +92,12 @@ class App {
         this.profile.session = this.session.snapshot();
         this.store.saveProfile(this.profile);
     }
-    /**
-     * @param {number} level
-     * @returns {Promise<import('./core/types.js').LevelDefinition>}
-     */
     obtainLevel(level) {
         const cached = this.store.getLevel(level);
         if (cached) return Promise.resolve(cached);
         if (this.prefetch && this.prefetch.level === level) return this.prefetch.promise;
         return this.solver.request('GENERATE_LEVEL', { level }, WORKER_POLICY.generateTimeoutMs);
     }
-    /**
-     * 背景預先生成下一關，通關後免等待
-     * @param {number} level
-     */
     prefetchLevel(level) {
         if (this.store.getLevel(level)) return;
         const promise = this.solver.request('GENERATE_LEVEL', { level }, WORKER_POLICY.generateTimeoutMs);
@@ -129,10 +109,6 @@ class App {
                 if (this.prefetch && this.prefetch.promise === promise) this.prefetch = null;
             });
     }
-    /**
-     * @param {number} level
-     * @param {import('./core/types.js').SessionSnapshot|null} snapshot
-     */
     async loadLevel(level, snapshot) {
         const token = ++this.loadToken;
         this.inputQueue = [];
@@ -158,10 +134,6 @@ class App {
             this.overlay.showError(err instanceof Error ? err.message : String(err), () => this.loadLevel(level, snapshot));
         }
     }
-    /**
-     * 點選試管：未持有則拿起；持有時嘗試倒入；不合法則搖晃並改為拿起被點的試管
-     * @param {number} id
-     */
     async handleTube(id) {
         const r = this.renderer;
         if (r.isBusy) {
@@ -225,9 +197,6 @@ class App {
             this.toast.show('沒有可以走的步了，試試復原或重置', { tone: 'warn', durationMs: 3600 });
         }
     }
-    /**
-     * @param {boolean} celebrate - 剛完成時播放慶祝；讀檔時直接顯示結果
-     */
     showWin(celebrate) {
         const s = this.session;
         const result = {
@@ -255,9 +224,6 @@ class App {
         this.renderer.clearHint();
         this.session.restart();
     }
-    /**
-     * @param {import('./ui/input.js').InputAction} action
-     */
     handleAction(action) {
         const r = this.renderer;
         switch (action) {
@@ -317,7 +283,7 @@ class App {
         this.hud.setHintBusy(true);
         try {
             const res = await this.solver.request('SOLVE_HINT', { board: s.board, capacity: s.capacity }, WORKER_POLICY.hintTimeoutMs);
-            if (version !== s.version) return; // 等待期間盤面已變動，結果作廢
+            if (version !== s.version) return;
             if (res.move) {
                 this.renderer.selectedId = null;
                 this.renderer.showHint(res.move);
