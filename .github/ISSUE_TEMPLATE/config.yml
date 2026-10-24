@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 私密回報安全性漏洞
+    url: https://github.com/Scorpio-meow/Liquid-Cipher/security/advisories/new
+    about: 安全性漏洞請透過 GitHub 私密漏洞回報，不要公開建立 Issue。

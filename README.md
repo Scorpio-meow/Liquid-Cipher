@@ -7,7 +7,7 @@
 [![Worker](https://img.shields.io/badge/Computation-Dedicated%20Web%20Worker-teal)](https://developer.mozilla.org/zh-TW/docs/Web/API/Web_Workers_API)
 [![Audio](https://img.shields.io/badge/Audio-Web%20Audio%20API%20Synthesis-orange)](https://developer.mozilla.org/zh-TW/docs/Web/API/Web_Audio_API)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun%20Compatible-black)](https://bun.sh)
-[![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%202.1%20Compliant-success)](https://www.w3.org/WAI/standards-guidelines/wcag/)
+[![Accessibility](https://img.shields.io/badge/Accessibility-WCAG%202.2%20AA%20Target-success)](./ACCESSIBILITY.md)
 [![License](https://img.shields.io/badge/License-MIT-green)](./LICENSE)
 
 液體解鎖 (Liquid Cipher) 是一款無限關卡的 Water Sort 試劑分離解謎網頁遊戲：把混在一起的試劑倒回各自的試管，讓每支試管只剩單一顏色。
@@ -196,6 +196,17 @@ bun test/verify_storage.js
 bun test/verify_layout.js
 bun test/verify_pwa.js
 ```
+
+---
+
+## 參與貢獻
+
+歡迎提交 Issue 或 Pull Request！開始之前請先閱讀：
+
+- [貢獻指南](./CONTRIBUTING.md)：開發環境、Commit 規範與 Pull Request 流程
+- [行為準則](./CODE_OF_CONDUCT.md)：參與社群的互動規範
+- [安全性政策](./SECURITY.md)：如何私下回報安全性漏洞
+- [無障礙聲明](./ACCESSIBILITY.md)：支援環境、已知限制與回報管道
 
 ---
 

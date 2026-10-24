@@ -1,0 +1,107 @@
+name: 錯誤回報
+description: 回報程式中的錯誤或非預期的行為
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝你花時間回報問題！送出前請先搜尋[現有 Issue](https://github.com/Scorpio-meow/Liquid-Cipher/issues?q=is%3Aissue)，確認沒有重複。
+        安全性漏洞請**不要**在此公開回報，請依照[安全性政策](https://github.com/Scorpio-meow/Liquid-Cipher/blob/main/SECURITY.md)私下回報。
+  - type: textarea
+    id: description
+    attributes:
+      label: 問題描述
+      description: 請清楚簡潔地說明發生了什麼問題。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重現步驟
+      description: 請列出能讓問題再次發生的步驟。
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 預期結果
+      description: 你原本預期會發生什麼？
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 實際結果
+      description: 實際發生了什麼？如有錯誤訊息、截圖或終端機輸出，請一併附上。
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: 瀏覽器
+      options:
+        - Chrome
+        - Edge
+        - Firefox
+        - Safari
+        - 其他（請在下方說明）
+    validations:
+      required: true
+  - type: input
+    id: browser-version
+    attributes:
+      label: 瀏覽器版本
+      placeholder: 例如 130.0
+  - type: dropdown
+    id: device
+    attributes:
+      label: 裝置類型
+      options:
+        - 桌上型電腦 / 筆記型電腦
+        - 手機
+        - 平板
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: 作業系統與版本
+      placeholder: 例如 Windows 11、macOS 15、iOS 18、Android 15
+    validations:
+      required: true
+  - type: dropdown
+    id: launch
+    attributes:
+      label: 開啟方式
+      options:
+        - GitHub Pages 線上版
+        - 已安裝的 PWA
+        - 本機伺服器（bunx serve）
+        - 直接開啟 index.html
+    validations:
+      required: true
+  - type: input
+    id: level
+    attributes:
+      label: 關卡編號
+      description: 問題與特定關卡有關時請填寫。
+      placeholder: 例如 27
+  - type: textarea
+    id: additional
+    attributes:
+      label: 其他資訊
+      description: 任何有助於釐清問題的補充資訊。
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 確認事項
+      options:
+        - label: 我已搜尋過現有 Issue，確認這不是重複的回報。
+          required: true
+        - label: 我同意遵守本專案的[行為準則](https://github.com/Scorpio-meow/Liquid-Cipher/blob/main/CODE_OF_CONDUCT.md)。
+          required: true
